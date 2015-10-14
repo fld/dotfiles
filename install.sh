@@ -1,13 +1,14 @@
 #!/bin/bash
 shopt -s extglob
 
-git pull origin master
+read -rn1 -p 'pull origin master? (Y/n): '
+[[ ! $REPLY =~ ^[Nn]$ ]] && git pull origin master; echo
 
-echo $PWD
-read -rn1 -p 'WARNING: Overwrite config files in: ~ (y/N): '
+read -rn1 -p "WARNING: Overwrite config files in: $HOME/ (y/N): "
 [[ ! $REPLY =~ ^[Yy]$ ]] && exit 0; echo
 
 #ln -sfv ~/dotfiles/.zshrc ~
 #ln -sfv ~/dotfiles/.zshrc.local ~
-#thats enough of that...
+#that's enough of that...
+
 for file in "$PWD"/.!(|.|git); do ln -sfv "$file" ~; done
