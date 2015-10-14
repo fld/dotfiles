@@ -1,0 +1,56 @@
+export EDITOR=vim
+export HISTSIZE=1000000
+export SAVEHIST=1000000
+
+[ -e "$HOME/bin" ] &&
+    export PATH="$HOME/bin:$PATH"
+
+#export PATH="$HOME/.rbenv/bin:$HOME/heroku-client/bin:$PATH"
+#eval "$(rbenv init -)"
+#[ -f ~/.travis/travis.sh ] &&
+#    source ~/.travis/travis.sh
+
+[ -e /usr/ha/bin ] &&
+    export PATH="/usr/ha/bin:$PATH"
+
+if [ "$SSH_TTY" -a -f $HOME/.otpw ]; then
+  PW_LINES=$(wc -l <$HOME/.otpw)
+  PW_USED=$(grep -- ---- $HOME/.otpw | wc -l)
+  echo "OTPW: $PW_USED/`echo $PW_LINES-2 | bc` used"
+fi
+
+function bgp() { $@ &>/dev/null & disown; }
+function md5() { echo -n "$1" | md5sum; }
+function fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
+function sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
+
+alias epw='~/encfs/encfs-setpass.sh'
+alias wwwlogs='sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199'
+alias wwwwatch='watch -n 0.5 "sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199"'
+function backupwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
+
+alias units='units -o %.20g'
+alias mdd='sudo mdadm -D /dev/md0'
+alias mdd1='sudo mdadm -D /dev/md1'
+alias mdd2='sudo mdadm -D /dev/md2'
+alias mde='sudo mdadm -E $1'
+alias mdx='sudo mdadm -X $1'
+alias mdb='sudo mdadm --examine-badblocks $1'
+alias mdstatwatch='watch -n1 "dmesg -T | tail -n 50;cat /proc/mdstat"'
+alias mismatches='grep "." /sys/block/md?/md/mismatch_cnt'
+alias alignments='grep "." /sys/block/*/alignment_offset'
+alias sectorsizes='smartctls -p | grep -e size -e "/dev/sd[a-z]:" | grep -v Disk'
+alias repairarrays='sudo tee /sys/block/md?/md/sync_action <<< repair'
+alias checkarrays='sudo tee /sys/block/md?/md/sync_action <<< check'
+alias usbsmartctl='sudo smartctl -T permissive -d sat'
+alias dfc='df -Ph | column -t'
+alias kernlog='dmesg -T | tail -n 50'
+alias klog='kernlog'
+alias kernlogwatch='watch -n1 "dmesg -T | tail -n 50"'
+alias kernlogwatchmdstat='watch -n1 "dmesg -T | tail -n 50;cat /proc/mdstat"'
+alias aliases='grep -e "^alias" ~/.bashrc ~/.zshrc ~/.zshrc.local'
+alias sourcezshrc='source ~/.zshrc'
+alias zshrc='vim ~/.zshrc'
+alias smblistusers='sudo pdbedit -L -v'
+alias ports='netstat -tulanp'
+alias firewall='sudo /sbin/iptables -L -n -v --line-numbers'
