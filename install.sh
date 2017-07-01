@@ -22,9 +22,6 @@ for file in "$PWD"/.!(|.|git*); do ln -sfv "$file" ~; done
 echo "Setting zsh as default."
 chsh -s "$(which zsh)"
 
-read -rn1 -p "Enable zplug? (Y/n): "
-[[ ! $REPLY =~ ^[Nn]$ ]] && zsh -i -c "enable-zplug"; echo
-
 read -rn1 -p "Install Vim plugins? (Y/n): "
 [[ $REPLY =~ ^[Nn]$ ]] && exit 0; echo
 
