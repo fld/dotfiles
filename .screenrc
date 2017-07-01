@@ -1,0 +1,5 @@
+escape ^DD
+defnonblock on
+autodetach on
+term screen-256color
+termcapinfo xterm* ti@:te@

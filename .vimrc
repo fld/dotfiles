@@ -50,6 +50,14 @@ autocmd Filetype mail,gitcommit,gitsendemail setlocal textwidth=72 spell
 
 " Visual
 colorscheme delek
+if has("gui_running")
+    colorscheme codeschool
+    set guioptions-=T
+    set guioptions+=b
+    set lines=80
+    set columns=200
+endif
+set guifont=Monospace\ 8
 set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ [HEX=\%02.2B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
 set number " line numbers
 set ruler " cursor position
@@ -85,6 +93,7 @@ call plug#begin('~/.vim/plugged')
     "Plug 'wincent/command-t'
     "Plug 'ciaranm/detectindent'
     Plug 'dahu/VimGym'
+    "Plug 'lornix/vim-scrollbar'
     "Plug 'Shougo/neocomplcache.vim'
 call plug#end()
 

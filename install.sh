@@ -1,14 +1,22 @@
 #!/bin/bash
-shopt -s extglob
+shopt -s extglob # BASH Extended Globbing
 
-read -rn1 -p 'pull origin master? (Y/n): '
+read -rn1 -p 'git pull origin master? (Y/n): '
 [[ ! $REPLY =~ ^[Nn]$ ]] && git pull origin master; echo
 
-read -rn1 -p "WARNING: Overwrite config files in: $HOME/ (y/N): "
+read -rn1 -p "WARNING: Overwrite config files under: $HOME/ (y/N): "
 [[ ! $REPLY =~ ^[Yy]$ ]] && exit 0; echo
 
-#ln -sfv ~/dotfiles/.zshrc ~
-#ln -sfv ~/dotfiles/.zshrc.local ~
-#that's enough of that...
+# Set zsh as default shell
+chsh -s "$(which zsh)"
 
+# Link dotfiles to ~
 for file in "$PWD"/.!(|.|git); do ln -sfv "$file" ~; done
+
+echo "Updating/cleaning Vim plugins:"
+vim -E -s <<-EOF
+    :source ~/.vimrc
+    :PlugInstall
+    :PlugClean
+    :qa
+EOF

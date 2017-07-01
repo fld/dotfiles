@@ -1,0 +1,13 @@
+[user]
+	name = fld
+	email = fld@r00t3d.com
+[sendemail]
+    smtpserver = gateway
+[push]
+    default = simple
+[color]
+    ui = auto
+[alias]
+    nccommit = commit -a --allow-empty-message -m \"\"
+[gui]
+	editor = kate
