@@ -17,7 +17,6 @@ for file in "$PWD"/.!(|.|git*); do echo "$file"; done
 read -rn1 -p "WARNING: Write config files under: $HOME/ (y/N): "
 [[ ! $REPLY =~ ^[Yy]$ ]] && exit 0; echo
 mv -i ~/.vim ~/.vim.old
-# Copy dotfiles under ~/
 for file in "$PWD"/.!(|.|git*); do ln -sfv "$file" ~; done
 
 echo "Setting zsh as default."
@@ -33,3 +32,4 @@ vim -E -s <<-EOF
     :PlugClean
     :qa
 EOF
+reset

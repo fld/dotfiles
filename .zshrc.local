@@ -45,7 +45,7 @@ fi
 
 # zplug
 function enable-zplug() {
-    source $HOME/dotfiles/.zplug/init.zsh
+    source $HOME/dotfiles/zplug/init.zsh
     zplug "plugins/git",   from:oh-my-zsh # GIT aliases
     zplug "supercrabtree/k" # 'k' listing for GIT
     zplug "micrenda/zsh-nohup" # ^h for backgrounding
