@@ -8,7 +8,7 @@ git submodule update
 echo
 
 if ! type zsh &>/dev/null; then
-    echo "sudo apt-get install zsh"
+    echo "sudo apt-get install zsh tmux"
     exit 1
 fi
 
