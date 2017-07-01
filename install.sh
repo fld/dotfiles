@@ -6,16 +6,15 @@ if ! type zsh tmux git vim &>/dev/null; then
     exit 1
 fi
 
-echo "Updating repos..."
+echo "Pulling latest master..."
 git pull origin master
-git submodule init
-git submodule update
 echo
 
-echo "dotfiles found:"
+echo "dotfiles:"
 for file in "$PWD"/.!(|.|git*); do echo "$file"; done
 read -rn1 -p "WARNING: Write config files under: $HOME/ (y/N): "
 [[ ! $REPLY =~ ^[Yy]$ ]] && exit 0; echo
+echo "moving old .vim/ to .vim.old/"
 mv -i ~/.vim ~/.vim.old
 for file in "$PWD"/.!(|.|git*); do ln -sfv "$file" ~; done
 
