@@ -32,5 +32,5 @@ vim -E -s <<-EOF
     :PlugClean
     :qa
 EOF
-
+reset
 zsh
