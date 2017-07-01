@@ -1,5 +1,5 @@
 [submodule ".zplug"]
-	path = .zplug
+	path = zplug
 	url = git@github.com:zplug/zplug.git
 [submodule "tmux-powerline"]
 	path = tmux-powerline
