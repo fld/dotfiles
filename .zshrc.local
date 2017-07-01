@@ -45,6 +45,7 @@ fi
 
 # zplug
 if [ ! -e $HOME/.zplug/init.zsh ]; then
+    rm -rf $HOME/.zplug
     curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
 fi
 source $HOME/.zplug/init.zsh
