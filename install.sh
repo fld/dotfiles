@@ -1,16 +1,16 @@
 #!/bin/bash
 shopt -s extglob # BASH Extended Globbing
 
+if ! type zsh tmux git vim &>/dev/null; then
+    echo "sudo apt-get install zsh tmux git vim"
+    exit 1
+fi
+
 echo "Updating repos..."
 git pull origin master
 git submodule init
 git submodule update
 echo
-
-if ! type zsh &>/dev/null; then
-    echo "sudo apt-get install zsh tmux"
-    exit 1
-fi
 
 echo "dotfiles found:"
 for file in "$PWD"/.!(|.|git*); do echo "$file"; done

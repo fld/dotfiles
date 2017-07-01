@@ -59,7 +59,7 @@ if ! zplug check --verbose; then
         echo; zplug install
     fi
 fi
-zplug load --verbose
+zplug load
 
 # Functions
 function bgp() { $@ &>/dev/null & disown; }
