@@ -33,4 +33,4 @@ vim -E -s <<-EOF
     :qa
 EOF
 reset
-zsh
+exec zsh

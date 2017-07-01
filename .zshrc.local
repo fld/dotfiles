@@ -44,7 +44,11 @@ if [ "$SSH_TTY" -a -f $HOME/.otpw ]; then
 fi
 
 # zplug
-source $HOME/dotfiles/zplug/init.zsh
+if [ ! -e $HOME/.zplug/init.zsh ]; then
+    curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
+fi
+source $HOME/.zplug/init.zsh
+zplug "erikw/tmux-powerline" # tmux-powerline
 zplug "plugins/git",   from:oh-my-zsh # GIT aliases
 zplug "supercrabtree/k" # 'k' listing for GIT
 zplug "micrenda/zsh-nohup" # ^h for backgrounding
@@ -52,6 +56,7 @@ zplug "zdharma/history-search-multi-word" # Better ^r search
 zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
 zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
 zplug "psprint/zsh-cmd-architect" # ^t CMD editor
+zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
 if ! zplug check --verbose; then
     printf "Install? [y/N]: "
