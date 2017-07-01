@@ -7,6 +7,11 @@ git submodule init
 git submodule update
 echo
 
+if ! type zsh &>/dev/null; then
+    echo "sudo apt-get install zsh"
+    exit 1
+fi
+
 echo "dotfiles found:"
 for file in "$PWD"/.!(|.|git*); do echo "$file"; done
 read -rn1 -p "WARNING: Write config files under: $HOME/ (y/N): "
