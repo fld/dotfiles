@@ -1,6 +1,0 @@
-[submodule ".zplug"]
-	path = zplug
-	url = https://github.com/zplug/zplug
-[submodule "tmux-powerline"]
-	path = tmux-powerline
-	url = https://github.com/erikw/tmux-powerline
