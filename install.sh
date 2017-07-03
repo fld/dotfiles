@@ -1,9 +1,8 @@
 #!/bin/bash
 shopt -s extglob # BASH Extended Globbing
 
-if ! type zsh tmux git vim &>/dev/null; then
-    echo "sudo apt-get install zsh tmux git vim"
-    exit 1
+if ! type zsh tmux git vim curl &>/dev/null; then
+    sudo apt-get install zsh tmux git vim curl
 fi
 
 echo "Pulling latest master..."
