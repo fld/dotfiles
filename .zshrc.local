@@ -60,12 +60,16 @@ zplug "psprint/zsh-cmd-architect" # ^t CMD editor
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
 if ! zplug check --verbose; then
-    printf "Install? [y/N]: "
+    printf "Install zplug? [y/N]: "
     if read -q; then
         echo; zplug install
     fi
 fi
 zplug load
+
+# Autojump
+[ -e /usr/share/autojump/autojump.sh ] && 
+    source /usr/share/autojump/autojump.sh
 
 # Functions
 function bgp() { $@ &>/dev/null & disown; }
