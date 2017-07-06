@@ -24,15 +24,15 @@ echo -e "\nSetting zsh as default.."
 chsh -s "$(which zsh)"
 
 read -rn1 -p $'Install Vim plugins? (Y/n):\n'
-if [[ ! $REPLY =~ ^[Nn]$ ]]; then
-    echo "Updating/cleaning Vim plugins:"
-    vim -E -s <<-EOF
-        :source ~/.vimrc
-        :PlugInstall
-        :PlugClean
-        :qa
-    EOF
-    reset
-fi
+[[ $REPLY =~ ^[Nn]$ ]] && exec zsh
+
+echo "Updating/cleaning Vim plugins:"
+vim -E -s <<-EOF
+    :source ~/.vimrc
+    :PlugInstall
+    :PlugClean
+    :qa
+EOF
+reset
 
 exec zsh
