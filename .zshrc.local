@@ -76,7 +76,7 @@ function bgp() { $@ &>/dev/null & disown; }
 function md5() { echo -n "$1" | md5sum; }
 function fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
 function sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
-function mkalias() { alias "$*" && echo alias "$*" >> ~/.zshrc.local }
+function mkalias { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local }
 function title { echo -en "\033]2;$1\007"; }
 function journaltail { sudo journalctl -f _TRANSPORT=kernel + $(sudo journalctl -F _COMM | sed -e 's/cron//' -e 's/^sudo//' -e 's/^/_COMM=/' | tr "\n" " ") }
 function inotifylist { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
@@ -107,7 +107,7 @@ alias klog='kernlog'
 alias kernlogwatch='watch -n1 "dmesg -T | tail -n 50"'
 alias aliases='grep -e "^alias" ~/.bashrc ~/.zshrc ~/.zshrc.local'
 alias sourcezshrc='source ~/.zshrc'
-alias zshrc='vim ~/.zshrc.local'
+alias zshrc='vim ~/.zshrc.local;sourcezshrc'
 alias smblistusers='sudo pdbedit -L -v'
 alias ports='netstat -tulanp'
 alias firewall='sudo /sbin/iptables -L -n -v --line-numbers'
@@ -128,3 +128,5 @@ alias dpkg-dist-list='find /etc/ -name "*.dpkg-dist" -o -name "*.dpkg-new" -o -n
 salias aga='apt-get autoremove'
 alias update-grml-zshrc='wget -O ~/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc'
 alias update-antigen='curl -L git.io/antigen > ~/dotfiles/antigen.zsh'
+alias zplug-update='zplug update;zplug clean'
+alias dotfiles-push='cd ~/dotfiles; git status; read "?Press any key to continue..."; git nccommit; gp; cd -; sourcezshrc'
