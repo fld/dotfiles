@@ -133,3 +133,4 @@ alias dotfiles-push='cd ~/dotfiles; git status; read "?Press any key to continue
 alias dotfiles-update='git -C ~/dotfiles pull origin master; sourcezshrc'
 alias aga2='sudo apt-get purge $(deborphan); sudo apt-get autoremove; sudo apt-get autoclean'
 alias agp='sudo apt-get purge'
+alias aga3='sudo apt-get purge $(deborphan --find-config --libdevel); sudo apt-get purge $(deborphan --guess-all); sudo apt-get autoremove; sudo apt-get autoclean'
