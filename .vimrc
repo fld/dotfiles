@@ -77,6 +77,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'scrooloose/nerdcommenter'
     Plug 'nvie/vim-togglemouse'
     Plug 'bling/vim-airline'
+    "Plug 'edkolev/tmuxline.vim'
     "Plug 'scrooloose/syntastic'
     Plug 'Yggdroot/indentLine'
     Plug 'ntpeters/vim-better-whitespace'
@@ -99,6 +100,7 @@ call plug#end()
 
 " Plugin settings / mappings
 let g:airline#extensions#tabline#enabled = 1
+let g:airline_powerline_fonts = 1
 let g:indentLine_enabled = 0
 let g:indentLine_leadingSpaceChar = '·'
 let g:better_whitespace_enabled = 0

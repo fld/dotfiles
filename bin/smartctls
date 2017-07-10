@@ -16,6 +16,20 @@ LIGHT_CYAN=$(tput bold; tput setaf 6)
 GRAY=$(tput sgr0; tput setaf 7)
 WHITE=$(tput bold; tput setaf 7)
 
+smartgrep='-e Read_Error -e Reallo -e Pending -e Uncorrect -e Temperature_Celsius -e Load_Cycle -e UDMA'
+
+partsize() {
+    PARTITIONS=''
+    DRIVE=${1##*/}
+    for PART in {1..4}; do
+        SIZE=$(grep $DRIVE$PART /proc/partitions | awk '{print $3 / 1024 / 1024}' | awk '{ printf "%.1f\n", $0 }')
+        if [ -n "$SIZE" ]; then
+            PARTITIONS="$PARTITIONS[$DRIVE$PART: ${SIZE}G] "
+        fi
+    done
+    echo $PARTITIONS
+}
+
 for CHECKDRIVE in /dev/sd[a-z]; do
     DRIVESIZE=$(sudo blockdev --getsz $CHECKDRIVE | awk '{print $1 * 1024 / 1000 / 1000 / 1000 / 2}' | awk '{ printf "%.0f\n", $0 }')
     echo $GREEN$CHECKDRIVE: $(sudo smartctl -i $CHECKDRIVE | grep "Model" | cut -d ' ' -f 7-12 | grep -v -e 'not available' -e 'No such') $YELLOW${DRIVESIZE}G $RED$(partsize $CHECKDRIVE)$GRAY
@@ -27,6 +41,6 @@ for CHECKDRIVE in /dev/sd[a-z]; do
     elif [[ $1 == '-b' ]]; then
         echo -n
     elif [[ -z $1 ]]; then
-        sudo smartctl -A $CHECKDRIVE | grep -e Read_Error -e Reallo -e Pending -e Uncorrect -e Temperature_Celsius -e Load_Cycle -e UDMA | grep -v -e 'No such'
+        sudo smartctl -A $CHECKDRIVE | grep $smartgrep | grep -v -e 'No such'
     fi
 done

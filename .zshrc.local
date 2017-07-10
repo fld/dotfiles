@@ -8,8 +8,8 @@ if [[ $(hostname) == 'main' ]]; then
 fi
 
 # tmux-powerline
-tmux-powerline-precmd() { $([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD") }
-add-zsh-hook precmd tmux-powerline-precmd
+#tmux-powerline-precmd() { $([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD") }
+#add-zsh-hook precmd tmux-powerline-precmd
 
 # Path
 [ -e "$HOME/bin" ] &&
@@ -28,7 +28,7 @@ add-zsh-hook precmd tmux-powerline-precmd
     export PATH="/usr/ha/bin:$PATH"
 
 # Hostname-based prompt colors for grml zsh
-source $HOME/dotfiles/bin/hostname-grml-zsh-colors.sh
+source $HOME/dotfiles/bin/grml-zsh-prompt-colors.sh
 
 # Heroku / Travis
 #export PATH="$HOME/.rbenv/bin:$HOME/heroku-client/bin:$PATH"
@@ -49,14 +49,15 @@ if [ ! -e $HOME/.zplug/init.zsh ]; then
     curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
 fi
 source $HOME/.zplug/init.zsh
-zplug "erikw/tmux-powerline" # tmux-powerline
+#zplug "erikw/tmux-powerline" # tmux-powerline
+zplug "tmux-plugins/tpm" # tmux plugin manager
 zplug "plugins/git",   from:oh-my-zsh # GIT aliases
-zplug "supercrabtree/k" # 'k' listing for GIT
+#zplug "supercrabtree/k" # 'k' listing for GIT
 zplug "micrenda/zsh-nohup" # ^h for backgrounding
-zplug "zdharma/history-search-multi-word" # Better ^r search
 zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
+zplug "zdharma/history-search-multi-word" # Better ^r search
+#zplug "psprint/zsh-cmd-architect" # ^t CMD editor
 zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
-zplug "psprint/zsh-cmd-architect" # ^t CMD editor
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 
 if ! zplug check --verbose; then
@@ -72,39 +73,43 @@ zplug load
     source /usr/share/autojump/autojump.sh
 
 # Functions
-function bgp() { $@ &>/dev/null & disown; }
-function md5() { echo -n "$1" | md5sum; }
-function fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
-function sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
-function mkalias { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local }
-function title { echo -en "\033]2;$1\007"; }
-function journaltail { sudo journalctl -f _TRANSPORT=kernel + $(sudo journalctl -F _COMM | sed -e 's/cron//' -e 's/^sudo//' -e 's/^/_COMM=/' | tr "\n" " ") }
-function inotifylist { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
-function syslogtail { sudo watch 'grep -vi -e "cron" -e "eth0:" -e "SMART Usage" /var/log/syslog | tail -n 20' }
-function backupwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
+bgp() { $@ &>/dev/null & disown; }
+md5() { echo -n "$1" | md5sum; }
+fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
+sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
+mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local }
+title() { echo -en "\033]2;$1\007"; }
+fld.journaltail() { sudo journalctl -f _TRANSPORT=kernel + $(sudo journalctl -F _COMM | sed -e 's/cron//' -e 's/^sudo//' -e 's/^/_COMM=/' | tr "\n" " ") }
+inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
+fld.syslogtail() { sudo watch 'grep -vi -e "cron" -e "eth0:" -e "SMART Usage" /var/log/syslog | tail -n 20' }
+backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
+iommugroups() {
+    find /sys/kernel/iommu_groups -maxdepth 1 -mindepth 1 -type d -exec \
+        bash -c 'i="$1"; echo "### Group ${i##*/} ###";
+        for j in "$i/devices/"*; do echo -n "    ";
+            lspci -s "${j##*/}"; done' _ {} \;
+}
 
 # Aliases
-alias wwwlogs='sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199'
-alias wwwwatch='watch -n 0.5 "sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199"'
+alias c='clear'
+alias fld.wwwlogs='sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199'
+alias fld.wwwwatch='watch -n 0.5 "sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199"'
 alias units='units -o %.20g'
 alias mdd='sudo mdadm -D /dev/md0'
 alias mdd1='sudo mdadm -D /dev/md1'
 alias mdd2='sudo mdadm -D /dev/md2'
-alias mde='sudo mdadm -E $1'
-alias mdx='sudo mdadm -X $1'
-alias mdb='sudo mdadm --examine-badblocks $1'
-alias mdstatwatch='watch -n1 "dmesg -T | tail -n 30;cat /proc/mdstat"'
+alias mde='sudo mdadm -E'
+alias mdx='sudo mdadm -X'
+alias mdb='sudo mdadm --examine-badblocks'
 alias mismatches='grep "." /sys/block/md?/md/mismatch_cnt'
 alias alignments='grep "." /sys/block/*/alignment_offset'
-alias sectorsizes='smartctls -p | grep -e size -e "/dev/sd[a-z]:" | grep -v Disk'
+alias fld.sectorsizes='smartctls -p | grep -e size -e "/dev/sd[a-z]:" | grep -v Disk'
 alias repairarrays='sudo tee /sys/block/md?/md/sync_action <<< repair'
 alias checkarrays='sudo tee /sys/block/md?/md/sync_action <<< check'
 alias idlearrays='sudo tee /sys/block/md?/md/sync_action <<< idle'
 alias usbsmartctl='sudo smartctl -T permissive -d sat'
 alias dfc='df -Ph | column -t'
-alias kernlog='dmesg -T | tail -n 50'
-alias klog='kernlog'
-alias kernlogwatch='watch -n1 "dmesg -T | tail -n 50"'
+alias fld.kernlogwatchmdstat='watch -n1 "dmesg -T | tail -n 15;cat /proc/mdstat;grep "." /sys/block/md?/md/mismatch_cnt"'
 alias aliases='grep -e "^alias" ~/.bashrc ~/.zshrc ~/.zshrc.local'
 alias sourcezshrc='source ~/.zshrc'
 alias zshrc='vim ~/.zshrc.local;sourcezshrc'
@@ -123,11 +128,10 @@ alias update-initramfs-running='sudo update-initramfs -u -k "$(uname -r)"'
 alias audittail='sudo multitail /var/log/audit/audit.log'
 alias apt-show-holds='dpkg --get-selections | grep hold'
 alias failedunits='sudo systemctl --all | grep failed'
-alias adb2='/home/fld/android-x86/android-sdk-linux/platform-tools/adb'
+alias fld.adb='~/android-x86/android-sdk-linux/platform-tools/adb'
 alias dpkg-dist-list='find /etc/ -name "*.dpkg-dist" -o -name "*.dpkg-new" -o -name "*.dpkg-old" -o -name "*.ucf-dist" -o -name "*.ucf-new" -o -name "*.ucf-old" | sort'
 alias aga='sudo apt-get autoremove'
-alias update-grml-zshrc='wget -O ~/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc'
-alias update-antigen='curl -L git.io/antigen > ~/dotfiles/antigen.zsh'
+alias update-grml-zshrc='wget -O ~/dotfiles/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc'
 alias zplug-update='zplug update;zplug clean'
 alias dotfiles-push='cd ~/dotfiles; git status; read "?Press any key to continue..."; git nccommit; gp; cd -; sourcezshrc'
 alias dotfiles-update='git -C ~/dotfiles pull origin master; sourcezshrc'

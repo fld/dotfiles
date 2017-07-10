@@ -1,11 +1,14 @@
 #!/bin/bash
 shopt -s extglob # BASH Extended Globbing
 
-if ! type zsh tmux git vim curl autojump &>/dev/null; then
-    sudo apt-get install zsh tmux git vim curl autojump
+packages="zsh tmux git vim curl wget autojump \\
+    ctags-exuberant fonts-powerline"
+
+if ! type "$packages" &>/dev/null; then
+    sudo apt-get install "$packages"
 fi
 
-cd ~/dotfiles
+cd ~/dotfiles || exit
 echo "Pulling latest master..."
 git pull origin master;echo
 
@@ -20,7 +23,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     for file in "$PWD"/.!(|.|git*); do ln -sfv "$file" ~; done
 fi
 
-echo -e "\nSetting zsh as default.."
+echo -e "\\nSetting zsh as default shell.."
 chsh -s "$(which zsh)"
 
 read -rn1 -p $'Install Vim plugins? (Y/n):\n'

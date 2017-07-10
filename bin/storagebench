@@ -1,5 +1,5 @@
 #!/bin/bash
-results='/var/log/storagebench.log'
+results="~/.storagebench.log"
 
 if (( EUID == 0 )); then·
     echo 'Do not run as root'; return; fi
