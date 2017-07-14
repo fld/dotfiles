@@ -73,16 +73,19 @@ zplug load
     source /usr/share/autojump/autojump.sh
 
 # Functions
+# Basic
+doc() { [[ -d "/usr/share/doc/$1" ]] && vim "/usr/share/doc/$1" || ls -lh /usr/share/doc/$1* }
+mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local }
 bgp() { $@ &>/dev/null & disown; }
 md5() { echo -n "$1" | md5sum; }
+title() { echo -en "\033]2;$1\007"; }
 fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
 sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
-mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local }
-title() { echo -en "\033]2;$1\007"; }
-fld.journaltail() { sudo journalctl -f _TRANSPORT=kernel + $(sudo journalctl -F _COMM | sed -e 's/cron//' -e 's/^sudo//' -e 's/^/_COMM=/' | tr "\n" " ") }
+# Special
 inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
-fld.syslogtail() { sudo watch 'grep -vi -e "cron" -e "eth0:" -e "SMART Usage" /var/log/syslog | tail -n 20' }
 backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
+fld.journaltail() { sudo journalctl -f _TRANSPORT=kernel + $(sudo journalctl -F _COMM | sed -e 's/cron//' -e 's/^sudo//' -e 's/^/_COMM=/' | tr "\n" " ") }
+fld.syslogtail() { sudo watch 'grep -vi -e "cron" -e "eth0:" -e "SMART Usage" /var/log/syslog | tail -n 20' }
 iommugroups() {
     find /sys/kernel/iommu_groups -maxdepth 1 -mindepth 1 -type d -exec \
         bash -c 'i="$1"; echo "### Group ${i##*/} ###";
@@ -139,3 +142,5 @@ alias aga2='sudo apt-get purge $(deborphan); sudo apt-get autoremove; sudo apt-g
 alias agp='sudo apt-get purge'
 alias aga3='sudo apt-get purge $(deborphan --find-config --libdevel); sudo apt-get purge $(deborphan --guess-all); sudo apt-get autoremove; sudo apt-get autoclean'
 alias awhy='aptitude why'
+alias dpkglistgrep='dpkg -l | grep'
+alias aptchanges='aptitude changelog'

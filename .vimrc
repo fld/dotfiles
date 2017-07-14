@@ -70,32 +70,36 @@ set mouse-=a " mouse defaults off
 
 " Plugins via. vim-plug
 call plug#begin('~/.vim/plugged')
-    Plug 'tpope/vim-sensible'
-    Plug 'majutsushi/tagbar'
-    Plug 'msanders/snipmate.vim'
-    Plug 'scrooloose/nerdtree'
-    Plug 'scrooloose/nerdcommenter'
-    Plug 'nvie/vim-togglemouse'
-    Plug 'bling/vim-airline'
-    "Plug 'edkolev/tmuxline.vim'
-    "Plug 'scrooloose/syntastic'
-    Plug 'Yggdroot/indentLine'
-    Plug 'ntpeters/vim-better-whitespace'
-    Plug 'jordwalke/VimAutoMakeDirectory'
-    Plug 'troydm/easybuffer.vim'
-    "Plug 'vim-scripts/bufexplorer.zip'
-    Plug 'kien/ctrlp.vim'
-    Plug 'tpope/vim-fugitive'
+    " Simple stuff
+    Plug 'tpope/vim-sensible' " community defaults
+    Plug 'tomasr/molokai' " colortheme
+    Plug 'nvie/vim-togglemouse' " toggle mouse command
+    Plug 'jordwalke/VimAutoMakeDirectory' " create dirs when needed 
+    Plug 'Yggdroot/indentLine' " vertical indentation lines
+    Plug 'ntpeters/vim-better-whitespace' " highlight wrong whitespace
+    " Simple++
+    Plug 'yegappan/grep' " [R|F|E|A]grep commands
+    Plug 'scrooloose/nerdcommenter' " commenting commands
+    Plug 'tpope/vim-fugitive' " :G-Git commands
+    " Medium
+    Plug 'troydm/easybuffer.vim' " easy buffer list
+    Plug 'scrooloose/nerdtree' " tree file explorer
+    Plug 'majutsushi/tagbar' " code structure overview
+    Plug 'kien/ctrlp.vim' " Ctrl+P fuzzy-finder
+    " Heavy
+    Plug 'garbas/vim-snipmate' " automatic code snippets
+    Plug 'bling/vim-airline' " powerline status-bar for vim
     Plug 'tpope/vim-rails', { 'for': 'ruby' }
     Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
     Plug 'klen/python-mode', { 'for': 'python' }
-    Plug 'tomasr/molokai'
-    Plug 'yegappan/grep'
+    "Plug 'dahu/VimGym'
+    "Plug 'scrooloose/syntastic'
+    "Plug 'vim-scripts/bufexplorer.zip'
     "Plug 'wincent/command-t'
     "Plug 'ciaranm/detectindent'
-    Plug 'dahu/VimGym'
     "Plug 'lornix/vim-scrollbar'
     "Plug 'Shougo/neocomplcache.vim'
+    "Plug 'edkolev/tmuxline.vim'
 call plug#end()
 
 " Plugin settings / mappings

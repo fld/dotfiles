@@ -15,6 +15,6 @@ while true; do
         d="$(<<< "scale=1; $rbps / 1024 / 1000" bc)MB/s"
     (( rbps <= 1024000 )) && 
         d="$(<<< "scale=0; $rbps / 1024" bc)kB/s"
-    echo -e "\u2193$d \u2191$u"
+    echo -e "\033[0;32m⟱\033[0m$d \033[0;31m⟰\033[0m$u"
     sleep 1s
 done
