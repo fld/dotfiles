@@ -92,6 +92,7 @@ call plug#begin('~/.vim/plugged')
     Plug 'tpope/vim-rails', { 'for': 'ruby' }
     Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
     Plug 'klen/python-mode', { 'for': 'python' }
+    " Disabled
     "Plug 'dahu/VimGym'
     "Plug 'scrooloose/syntastic'
     "Plug 'vim-scripts/bufexplorer.zip'

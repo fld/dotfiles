@@ -59,7 +59,6 @@ zplug "zdharma/history-search-multi-word" # Better ^r search
 #zplug "psprint/zsh-cmd-architect" # ^t CMD editor
 zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-
 if ! zplug check --verbose; then
     printf "Install zplug? [y/N]: "
     if read -q; then
@@ -81,7 +80,7 @@ md5() { echo -n "$1" | md5sum; }
 title() { echo -en "\033]2;$1\007"; }
 fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
 sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
-# Special
+# Specialized
 inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
 backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
 fld.journaltail() { sudo journalctl -f _TRANSPORT=kernel + $(sudo journalctl -F _COMM | sed -e 's/cron//' -e 's/^sudo//' -e 's/^/_COMM=/' | tr "\n" " ") }
