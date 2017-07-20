@@ -1,7 +1,12 @@
 # dotfiles
-My personal zsh shell config files
+personal zsh config files
 
 ### Featuring
 - grml-zsh + zplug
-- vim + vimplug + vim-airline
-- tmux + tmux-powerline
+- vim + vim-plug + vim-airline
+- tmux + tpm
+
+### Install
+```
+bash <(wget -O - 'https://raw.githubusercontent.com/fld/dotfiles/master/install.sh')
+```

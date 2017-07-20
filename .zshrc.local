@@ -143,3 +143,4 @@ alias aga3='sudo apt-get purge $(deborphan --find-config --libdevel); sudo apt-g
 alias awhy='aptitude why'
 alias dpkglistgrep='dpkg -l | grep'
 alias aptchanges='aptitude changelog'
+alias poweronhours='for d in /dev/sd?; do echo -n $d; sudo smartctl -A $d | grep Power_On; done'
