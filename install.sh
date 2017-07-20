@@ -8,7 +8,10 @@ if ! type "$packages" &>/dev/null; then
     sudo apt install "$packages"
 fi
 
-cd ~/dotfiles || exit
+[[ -d ~/dotfiles ]] || 
+    git clone 'https://github.com/fld/dotfiles'
+    
+cd ~/dotfiles || exit 1
 echo "Pulling latest master..."
 git pull origin master;echo
 
