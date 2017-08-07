@@ -1,0 +1,43 @@
+# Debian
+deb http://ftp.fi.debian.org/debian/ stretch main contrib non-free 
+
+# Debian Security
+deb http://security.debian.org/ stretch/updates main contrib non-free 
+
+# Debian Updates
+deb http://ftp.fi.debian.org/debian/ stretch-updates main contrib non-free
+
+# Debian Backports
+deb http://ftp.fi.debian.org/debian/ stretch-backports main contrib non-free
+#deb-src http://ftp.fi.debian.org/debian/ stretch-backports main contrib non-free
+
+# Debian Stable [src]
+#deb-src http://ftp.fi.debian.org/debian/ stable main non-free contrib
+# Debian Testing [src]
+#deb-src http://ftp.fi.debian.org/debian/ testing main non-free contrib 
+# Debian Unstable [src]
+#deb-src http://ftp.fi.debian.org/debian/ sid main non-free contrib 
+# Debian Experimental [src]
+#deb-src http://ftp.fi.debian.org/debian/ experimental main non-free contrib
+
+# Tor
+#deb http://deb.torproject.org/torproject.org stretch main
+# i2p - The Invisible Internet Project
+#deb http://deb.i2p2.no/ stretch main
+# Weechat
+#deb http://debian.weechat.org stretch main
+
+# wine-staging
+#deb http://dl.winehq.org/wine-builds/debian/ stretch main
+# PlayOnLinux
+#deb http://deb.playonlinux.com/ stretch main
+# Lutris - Open gaming platform
+#deb http://download.opensuse.org/repositories/home:/strycore/Debian_9.0/ ./
+# Albert - A fast and flexible keyboard launcher
+#deb http://repo.adminlounge.org/ stretch main
+
+
+# Debian Multimedia
+#deb http://ftp.deb-multimedia.org/ stable main non-free 
+# Grml
+#deb http://deb.grml.org/ grml-stable main 
