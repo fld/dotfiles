@@ -6,7 +6,8 @@ dotrepo='https://github.com/fld/dotfiles'
 # Check&install if apt-cacher-ng is available at gateway:3142
 if ping -c 1 gateway &> /dev/null; then
     type nc || sudo apt install nc
-    if nc -w 1 gateway 3142 &> /dev/null; then
+    timeout 1 nc gateway 3142 &> /dev/null
+    if [[ $? -eq 124 ]]; then
         [[ -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]] ||
             sudo cp ~/dotfiles/etc/apt/apt.conf.d/000apt-cacher-ng-proxy "/etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
     fi
