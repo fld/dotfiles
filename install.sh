@@ -2,12 +2,19 @@
 shopt -s extglob # BASH Extended Globbing
 
 dotrepo='https://github.com/fld/dotfiles'
-packages='zsh tmux screen git vim curl wget sed awk grep autojump ctags-exuberant urlview'
+
+# Check&install if apt-cacher-ng is available at gateway:3142
+if ping -c 1 gateway &> /dev/null; then
+    type nc || sudo apt install nc
+    if nc -w 1 gateway 3142 &> /dev/null; then
+        [[ -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]] ||
+            sudo cp ~/dotfiles/etc/apt/apt.conf.d/000apt-cacher-ng-proxy "/etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
+    fi
+fi
 
 # Install needed packages via apt & sudo
-if ! type "$packages"; then
-    sudo apt install "$packages"
-fi
+sudo apt install zsh tmux screen git vim curl wget sed gawk grep \
+    autojump exuberant-ctags urlview
 
 # Get latest dotfiles
 [[ -d ~/dotfiles ]] || git clone "$dotrepo"
