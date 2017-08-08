@@ -87,12 +87,12 @@ call plug#begin('~/.vim/plugged')
     Plug 'majutsushi/tagbar' " code structure overview
     Plug 'kien/ctrlp.vim' " Ctrl+P fuzzy-finder
     " Heavy
-    Plug 'garbas/vim-snipmate' " automatic code snippets
+    "Plug 'garbas/vim-snipmate' " automatic code snippets
     Plug 'bling/vim-airline' " powerline status-bar for vim
     Plug 'tpope/vim-rails', { 'for': 'ruby' }
     Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
     Plug 'klen/python-mode', { 'for': 'python' }
-    " Disabled
+    " Old
     "Plug 'dahu/VimGym'
     "Plug 'scrooloose/syntastic'
     "Plug 'vim-scripts/bufexplorer.zip'
