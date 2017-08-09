@@ -10,7 +10,7 @@ if [[ $? != 0 ]]; then
 fi
 
 if [[ ! -z $mailcount ]]; then
-    echo '#[fg=colour148, bg=colour233]◀#[fg=colour233, bg=colour148] ◚ '"$mailcount"' #[fg=colour33, bg=colour148]◀'
+    echo '#[fg=colour233, bg=colour148] ◚ '"$mailcount"' '
 else
-    echo '#[fg=colour24, bg=colour233]◀'
+    echo ''
 fi
