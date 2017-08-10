@@ -7,10 +7,6 @@ if [[ $(hostname) == 'main' ]]; then
     export LIBVIRT_DEFAULT_URI='qemu:///system'
 fi
 
-# tmux-powerline
-#tmux-powerline-precmd() { $([ -n "$TMUX" ] && tmux setenv TMUXPWD_$(tmux display -p "#D" | tr -d %) "$PWD") }
-#add-zsh-hook precmd tmux-powerline-precmd
-
 # Path
 [ -e "$HOME/bin" ] &&
     export PATH="$HOME/bin:$PATH"
@@ -49,14 +45,11 @@ if [ ! -e $HOME/.zplug/init.zsh ]; then
     curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
 fi
 source $HOME/.zplug/init.zsh
-#zplug "erikw/tmux-powerline" # tmux-powerline
 zplug "tmux-plugins/tpm" # tmux plugin manager
 zplug "plugins/git",   from:oh-my-zsh # GIT aliases
-#zplug "supercrabtree/k" # 'k' listing for GIT
 zplug "micrenda/zsh-nohup" # ^h for backgrounding
 zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
 zplug "zdharma/history-search-multi-word" # Better ^r search
-#zplug "psprint/zsh-cmd-architect" # ^t CMD editor
 zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 if ! zplug check --verbose; then
@@ -72,6 +65,19 @@ zplug load
     source /usr/share/autojump/autojump.sh
 
 # Functions
+ssh() {
+    if [[ $(ps -p $(ps -p $$ -o ppid=) -o comm=) =~ tmux ]]; then
+        #tmux set-option set-titles-string "$(echo $* | rev | cut -d ' ' -f1 | rev | cut -d . -f 1) #I⦁#W #{session_alerts}"
+        tmux set-window-option allow-rename off
+        tmux rename-window "$(echo $* | rev | cut -d ' ' -f1 | rev | cut -d . -f 1)"
+        command ssh "$@"
+        tmux set-window-option allow-rename on
+        #tmux set-option set-titles-string "#(echo $USER)@#h #I⦁#W #{session_alerts}"
+    else
+        command ssh "$@"
+    fi
+}
+
 # Basic
 doc() { [[ -d "/usr/share/doc/$1" ]] && vim "/usr/share/doc/$1" || ls -lh /usr/share/doc/$1* }
 mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local }
@@ -80,6 +86,7 @@ md5() { echo -n "$1" | md5sum; }
 title() { echo -en "\033]2;$1\007"; }
 fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
 sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
+
 # Specialized
 inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
 backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
@@ -120,6 +127,7 @@ alias ports='netstat -tulanp'
 alias firewall='sudo /sbin/iptables -L -n -v --line-numbers'
 alias swappers='smem -k -s swap'
 alias dmtail='sudo dmesg -Tw'
+alias dmtail2='multitail /var/log/messages'
 alias cifsumount='sudo umount -a -t cifs -l'
 alias udevreload='sudo udevadm control --reload'
 alias apt-frankensteins='apt-show-versions | grep -e "testing" -e "unstable" -e "/sid" -e "*manually*" -e "No available" -e "newer than"'
