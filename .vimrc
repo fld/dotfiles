@@ -105,7 +105,7 @@ call plug#end()
 
 " Plugin settings / mappings
 let g:airline#extensions#tabline#enabled = 1
-let g:airline_powerline_fonts = 1
+let g:airline_powerline_fonts = 0
 let g:indentLine_enabled = 0
 let g:indentLine_leadingSpaceChar = '·'
 let g:better_whitespace_enabled = 0
