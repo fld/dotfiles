@@ -36,8 +36,10 @@ deb http://ftp.fi.debian.org/debian/ stretch-backports main contrib non-free
 # Albert - A fast and flexible keyboard launcher
 #deb http://repo.adminlounge.org/ stretch main
 
-
 # Debian Multimedia
 #deb http://ftp.deb-multimedia.org/ stable main non-free 
 # Grml
 #deb http://deb.grml.org/ grml-stable main 
+# LLVM Toolchain - apt.llvm.org
+#deb http://apt.llvm.org/stretch/ llvm-toolchain-4.0 main
+#deb http://apt.llvm.org/stretch/ llvm-toolchain-5.0 main
