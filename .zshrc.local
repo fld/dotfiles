@@ -42,11 +42,12 @@ fi
 # zplug
 if [ ! -e $HOME/.zplug/init.zsh ]; then
     rm -rf $HOME/.zplug
-    curl -sL --proto-redir -all,https https://raw.githubusercontent.com/zplug/installer/master/installer.zsh| zsh
+    type wget || sudo apt install wget
+    zsh <(wget -O- "https://raw.githubusercontent.com/zplug/installer/master/installer.zsh")
 fi
 source $HOME/.zplug/init.zsh
 zplug "tmux-plugins/tpm" # tmux plugin manager
-zplug "plugins/git",   from:oh-my-zsh # GIT aliases
+zplug "plugins/git", from:oh-my-zsh # GIT aliases
 zplug "micrenda/zsh-nohup" # ^h for backgrounding
 zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
 zplug "zdharma/history-search-multi-word" # Better ^r search
@@ -65,22 +66,29 @@ zplug load
     source /usr/share/autojump/autojump.sh
 
 # Functions
+# tmux title -wrapper for ssh
 ssh() {
     if [[ $(ps -p $(ps -p $$ -o ppid=) -o comm=) =~ tmux ]]; then
-        #tmux set-option set-titles-string "$(echo $* | rev | cut -d ' ' -f1 | rev | cut -d . -f 1) #I⦁#W #{session_alerts}"
         tmux set-window-option allow-rename off
         tmux rename-window "$(echo $* | rev | cut -d ' ' -f1 | rev | cut -d . -f 1)"
         command ssh "$@"
         tmux set-window-option allow-rename on
-        #tmux set-option set-titles-string "#(echo $USER)@#h #I⦁#W #{session_alerts}"
     else
         command ssh "$@"
     fi
 }
 
+# dotfiles binding -wrapper for systemd-nspawn
+ns_dotfiles=("--bind-ro=$HOME/dotfiles" "--bind-ro=$HOME/.zplug")
+for f in $HOME/dotfiles/.*; do
+    [[ $f != */@(.|..) && $f -ef $HOME/${f##*/} ]] &&
+        ns_dotfiles+=("--bind-ro=$f:$HOME/${f##*/}")
+done
+systemd-nspawn-wip() { command sudo systemd-nspawn ${^ns_dotfiles} $@; } # man zshexpn(1) ${^spec}
+
 # Basic
-doc() { [[ -d "/usr/share/doc/$1" ]] && vim "/usr/share/doc/$1" || ls -lh /usr/share/doc/$1* }
-mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local }
+doc() { [[ -d "/usr/share/doc/$1" ]] && vim "/usr/share/doc/$1" || ls -lh /usr/share/doc/$1*; }
+mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local; }
 bgp() { $@ &>/dev/null & disown; }
 md5() { echo -n "$1" | md5sum; }
 title() { echo -en "\033]2;$1\007"; }
@@ -88,10 +96,10 @@ fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on 
 sprunge() { curl -F 'sprunge=<-' http://sprunge.us < "${1:-/dev/stdin}"; }
 
 # Specialized
-inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
-backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
 fld.journaltail() { sudo journalctl -f _TRANSPORT=kernel + $(sudo journalctl -F _COMM | sed -e 's/cron//' -e 's/^sudo//' -e 's/^/_COMM=/' | tr "\n" " ") }
 fld.syslogtail() { sudo watch 'grep -vi -e "cron" -e "eth0:" -e "SMART Usage" /var/log/syslog | tail -n 20' }
+inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
+backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
 iommugroups() {
     find /sys/kernel/iommu_groups -maxdepth 1 -mindepth 1 -type d -exec \
         bash -c 'i="$1"; echo "### Group ${i##*/} ###";
@@ -100,9 +108,12 @@ iommugroups() {
 }
 
 # Aliases
-alias c='clear'
 alias fld.wwwlogs='sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199'
 alias fld.wwwwatch='watch -n 0.5 "sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199"'
+alias fld.sectorsizes='smartctls -p | grep -e size -e "/dev/sd[a-z]:" | grep -v Disk'
+alias fld.kernlogwatchmdstat='watch -n1 "dmesg -T | tail -n 15;cat /proc/mdstat;grep "." /sys/block/md?/md/mismatch_cnt"'
+alias fld.adb='~/android-x86/android-sdk-linux/platform-tools/adb'
+alias c='clear'
 alias units='units -o %.20g'
 alias mdd='sudo mdadm -D /dev/md0'
 alias mdd1='sudo mdadm -D /dev/md1'
@@ -112,13 +123,11 @@ alias mdx='sudo mdadm -X'
 alias mdb='sudo mdadm --examine-badblocks'
 alias mismatches='grep "." /sys/block/md?/md/mismatch_cnt'
 alias alignments='grep "." /sys/block/*/alignment_offset'
-alias fld.sectorsizes='smartctls -p | grep -e size -e "/dev/sd[a-z]:" | grep -v Disk'
 alias repairarrays='sudo tee /sys/block/md?/md/sync_action <<< repair'
 alias checkarrays='sudo tee /sys/block/md?/md/sync_action <<< check'
 alias idlearrays='sudo tee /sys/block/md?/md/sync_action <<< idle'
 alias usbsmartctl='sudo smartctl -T permissive -d sat'
 alias dfc='df -Ph | column -t'
-alias fld.kernlogwatchmdstat='watch -n1 "dmesg -T | tail -n 15;cat /proc/mdstat;grep "." /sys/block/md?/md/mismatch_cnt"'
 alias aliases='grep -e "^alias" ~/.bashrc ~/.zshrc ~/.zshrc.local'
 alias sourcezshrc='source ~/.zshrc'
 alias zshrc='vim ~/.zshrc.local;sourcezshrc'
@@ -138,7 +147,6 @@ alias update-initramfs-running='sudo update-initramfs -u -k "$(uname -r)"'
 alias audittail='sudo multitail /var/log/audit/audit.log'
 alias apt-show-holds='dpkg --get-selections | grep hold'
 alias failedunits='sudo systemctl --all | grep failed'
-alias fld.adb='~/android-x86/android-sdk-linux/platform-tools/adb'
 alias dpkg-dist-list='find /etc/ -name "*.dpkg-dist" -o -name "*.dpkg-new" -o -name "*.dpkg-old" -o -name "*.ucf-dist" -o -name "*.ucf-new" -o -name "*.ucf-old" | sort'
 alias aga='sudo apt-get autoremove'
 alias update-grml-zshrc='wget -O ~/dotfiles/.zshrc https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc'
@@ -156,3 +164,5 @@ alias aa-logprof-auditlog='sudo aa-logprof -f <(sudo aa-decode <(cat /var/log/au
 alias agbd='sudo apt-get build-dep'
 alias ta='tmux attach'
 alias ntp-update='sudo systemctl stop ntp; sudo ntpd -gq; sudo systemctl start ntp'
+alias apt-get-no-proxy='apt-get -o Acquire::http::Proxy=false'
+alias screen-grml='screen -c .screenrcgrml'

@@ -87,8 +87,8 @@ call plug#begin('~/.vim/plugged')
     Plug 'majutsushi/tagbar' " code structure overview
     Plug 'kien/ctrlp.vim' " Ctrl+P fuzzy-finder
     " Heavy
-    "Plug 'garbas/vim-snipmate' " automatic code snippets
     Plug 'bling/vim-airline' " powerline status-bar for vim
+    "Plug 'garbas/vim-snipmate' " automatic code snippets
     Plug 'tpope/vim-rails', { 'for': 'ruby' }
     Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
     Plug 'klen/python-mode', { 'for': 'python' }
@@ -182,7 +182,6 @@ nnoremap <leader>eg <C-w>s<C-w>j:e ~/.gitconfig<cr>
 nnoremap <leader>ez <C-w>s<C-w>j:e ~/.zshrc<cr>
 nnoremap <leader>eb <C-w>s<C-w>j:e ~/.bashrc<cr>
 nnoremap <leader>et <C-w>s<C-w>j:e ~/.tmux.conf<cr>
-nnoremap <leader>es <C-w>s<C-w>j:e ~/.vim/plugged/snipmate.vim/snippets/<cr>
 
 " Short vim-scripts
 
