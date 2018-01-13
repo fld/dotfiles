@@ -3,7 +3,7 @@ shopt -s extglob # BASH Extended Globbing
 
 dotrepo='https://github.com/fld/dotfiles'
 
-# Check&install if apt-cacher-ng is available at gateway:3142
+# Check if apt-cacher-ng is available at gateway:3142
 if ping -c 1 gateway &> /dev/null; then
     type nc &> /dev/null || sudo apt install nc
     timeout 1 nc gateway 3142 &> /dev/null
@@ -23,8 +23,8 @@ cd ~/dotfiles || exit 1
 echo "Pulling latest origin/master..."
 git pull origin master;echo
 
-# Install mysources.list via sudo
-slwc=$(wc -w /etc/apt/sources.list | cut -d' ' -f1) # Wordcounts compared
+# Install mysources.list (as sources.list (if wordcount-Δ >20))
+slwc=$(wc -w /etc/apt/sources.list | cut -d' ' -f1)
 mslwc=$(wc -w ~/dotfiles/etc/apt/sources.list.d/mysources.list | cut -d' ' -f1)
 msldst='/etc/apt/sources.list' #msldst='/etc/apt/sources.list.d/mysources.list'
 if [[ $(( slwc - mslwc )) -gt 20 || $(( mslwc - slwc )) -gt 20 ]]; then
@@ -49,10 +49,6 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     for file in "$PWD"/.!(|.|git*); do ln -sf "$file" ~; done
 fi
 
-# Change default shell
-echo -e "\\nSetting zsh as default shell.."
-chsh -s "$(which zsh)"
-
 # Install vim-plug
 read -rn1 -p $'Install Vim plugins? (Y/n):\n'
 [[ $REPLY =~ ^[Nn]$ ]] && exec zsh
@@ -66,4 +62,7 @@ vim -E -s <<-EOF
 EOF
 reset
 
+# Change default shell
+echo -e "\\nSetting zsh as default shell.."
+chsh -s "$(which zsh)"
 exec zsh

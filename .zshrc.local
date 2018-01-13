@@ -88,7 +88,7 @@ systemd-nspawn-wip() { command sudo systemd-nspawn ${^ns_dotfiles} $@; } # man z
 
 # Basic
 doc() { [[ -d "/usr/share/doc/$1" ]] && vim "/usr/share/doc/$1" || ls -lh /usr/share/doc/$1*; }
-mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local; source ~/.zshrc.local; }
+mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local;source ~/.zshrc.local;tail -n1 ~/.zshrc.local; }
 bgp() { $@ &>/dev/null & disown; }
 md5() { echo -n "$1" | md5sum; }
 title() { echo -en "\033]2;$1\007"; }
@@ -160,9 +160,10 @@ alias awhy='aptitude why'
 alias dpkglistgrep='dpkg -l | grep'
 alias aptchanges='aptitude changelog'
 alias poweronhours='for d in /dev/sd?; do echo -n $d; sudo smartctl -A $d | grep Power_On; done'
-alias aa-logprof-auditlog='sudo aa-logprof -f <(sudo aa-decode <(cat /var/log/audit/audit.log /var/log/audit/audit.log.1))'
+alias aa-logprof-auditlog='sudo aa-logprof -f <(sudo aa-decode <(sudo cat /var/log/audit/audit.log /var/log/audit/audit.log.1))'
 alias agbd='sudo apt-get build-dep'
 alias ta='tmux attach'
 alias ntp-update='sudo systemctl stop ntp; sudo ntpd -gq; sudo systemctl start ntp'
 alias apt-get-no-proxy='apt-get -o Acquire::http::Proxy=false'
 alias screen-grml='screen -c .screenrcgrml'
+alias aga4='agp $(apt-frankensteins | cut -f1 -d " ")'
