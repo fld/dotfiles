@@ -78,7 +78,7 @@ ssh() {
     fi
 }
 
-# dotfiles binding -wrapper for systemd-nspawn
+# TODO/W-I-P: dotfiles binding -wrapper for systemd-nspawn
 ns_dotfiles=("--bind-ro=$HOME/dotfiles" "--bind-ro=$HOME/.zplug")
 for f in $HOME/dotfiles/.*; do
     [[ $f != */@(.|..) && $f -ef $HOME/${f##*/} ]] &&
