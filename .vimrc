@@ -108,7 +108,7 @@ let g:airline#extensions#tabline#enabled = 1
 let g:airline_powerline_fonts = 0
 let g:indentLine_enabled = 0
 let g:indentLine_leadingSpaceChar = '·'
-let g:better_whitespace_enabled = 0
+"let g:better_whitespace_enabled = 0
 map <C-n> :NERDTreeToggle<CR><F12><CR> " F12 via vim-togglemouse
 map <C-c> :TagbarToggle<CR>
 map <C-b> :EasyBuffer<CR>
