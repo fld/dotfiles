@@ -1,6 +1,6 @@
 [user]
-	name = fld
-	email = fld@r00t3d.com
+    name = fld
+    email = fld@r00t3d.com
 [sendemail]
     smtpserver = gateway
 [push]
@@ -10,4 +10,10 @@
 [alias]
     nccommit = commit -a --allow-empty-message -m \"\"
 [gui]
-	editor = kate
+    editor = kate
+
+[url "git://anongit.kde.org/"]
+       insteadOf = kde:
+[url "ssh://git@git.kde.org/"]
+       pushInsteadOf = kde:
+
