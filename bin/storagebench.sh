@@ -2,7 +2,7 @@
 results=".storagebench.log"
 
 if (( EUID == 0 )); then echo 'Do not run as root'; exit 1; fi
-if [[ ! -w $results ]]; then echo 'Need write permission'; exit 1; fi
+if ! touch "$results"; then echo 'Need write permission'; exit 1; fi
 if ! sudo bash -c '(( EUID == 0 ))'; then echo 'Need sudo permissions'; exit 1; fi
 if ! sudo bash -c 'hash fio ioping bonnie++' 2>/dev/null; then
     echo 'Run: sudo apt-get install fio ioping bonnie++ dmidecode gawk'
