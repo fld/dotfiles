@@ -1,15 +1,16 @@
 #!/bin/bash
 results="~/.storagebench.log"
 
-if (( EUID == 0 )); then·
-    echo 'Do not run as root'; return; fi
+(( EUID == 0 )) && echo 'Do not run as root'
 if ! sudo bash -c '(( EUID == 0 ))'; then
-    echo 'Need sudo permissions'; return; fi
-if ! sudo bash -c 'hash fio ioping bonnie++' 2>/dev/null; then·
-    echo 'Run: sudo apt-get install fio ioping bonnie++'; return; fi
+    echo 'Need sudo permissions'
+fi
+if ! sudo bash -c 'hash fio ioping bonnie++' 2>/dev/null; then
+    echo 'Run: sudo apt-get install fio ioping bonnie++'
+fi
 
 size="$(free --si -g | awk '/Mem:/{print 2*$2+1}')"
-sudo touch "$results"; sudo chown "$USER.$USER" "$results"
+touch "$results" || exit 1
 echo -e "\n$(date) ($*)" >> "$results"
 "time" iozone -i 0 -i 1 -i 2 -a -s "$size"G -r 1M 2>&1 | tee -a "$results"
 mkdir bonnie
