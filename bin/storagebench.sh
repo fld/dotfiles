@@ -22,6 +22,6 @@ fio --output=fio.log --bs=4k --ioengine=libaio --iodepth=128 --numjobs="$cpunr" 
 grep fio.log -i -e 'write: i' -e 'read :' -e 'read:' -e 'cpu' -e 'Run' -e 'ioen' -e 'ios=' | tee -a "$results"
 fio --output=fio.log --bs=4k --ioengine=libaio --iodepth=1 --numjobs=1 --size=128M --direct=1 --directory=bonnie/ --name=randrw --rw=randrw
 grep fio.log -i -e 'write: i' -e 'read :' -e 'read:' -e 'cpu' -e 'Run' -e 'ioen' -e 'ios=' | tee -a "$results"
-ioping -R bonnie/ | tee -a $results"
+ioping -R bonnie/ | tee -a "$results"
 
 rm -R fio.log bonnie/
