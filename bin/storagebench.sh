@@ -22,7 +22,7 @@ sudo "time" bonnie++ -u "$USER" -s "$size"G -d bonnie/ 2>&1 | tee "bonnie.log"
 grep -v "...done" bonnie.log | tee -a "$results"
 fio --output=fio.log --bs=4k --ioengine=libaio --iodepth=128 --numjobs="$cpunr" --size=$(( size / 2 ))G --direct=1 --directory=fio/ --name=read-write --rw=rw
 grep fio.log -i -e 'write: i' -e 'read :' -e 'read:' -e 'cpu' -e 'Run' -e 'ioen' -e 'ios=' | tee -a "$results"
-fio --output=fio.log --bs=4k --ioengine=libaio --iodepth=1 --numjobs=1 --size="$size" --runtime=60 --direct=1 --directory=fio/ --name=randrw --rw=randrw
+fio --output=fio.log --bs=4k --ioengine=libaio --iodepth=1 --numjobs=1 --size="$size"G --runtime=60 --direct=1 --directory=fio/ --name=randrw --rw=randrw
 grep fio.log -i -e 'write: i' -e 'read :' -e 'read:' -e 'cpu' -e 'Run' -e 'ioen' -e 'ios=' | tee -a "$results"
 ioping -R ioping/ | tee -a "$results"
 
