@@ -17,7 +17,7 @@ mkdir bonnie fio ioping || exit 1
 echo -e "\n$(date) - $(uname -r) - ${size}G - $sysname: ($*)" >> "$results"
 
 "time" iozone -i 0 -i 1 -i 2 -a -s "$size"G -r 1M 2>&1 | tee "iozone.log"
-grep -B4 "iozone test complete." iozone.log | tee -a "$results"
+grep -B4 "iozone test complete." iozone.log >> "$results"
 sudo "time" bonnie++ -u "$USER" -s "$size"G -d bonnie/ 2>&1 | tee "bonnie.log"
 grep -v "...done" bonnie.log >> "$results"
 fio --output=fio.log --bs=4k --ioengine=libaio --iodepth=128 --numjobs="$cpunr" --size=$(( size / 2 ))G --direct=1 --directory=fio/ --name=read-write --rw=rw
