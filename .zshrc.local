@@ -111,7 +111,7 @@ iommugroups() {
 alias fld.wwwlogs='sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199'
 alias fld.wwwwatch='watch -n 0.5 "sudo tail -n15 /var/log/apache2/access.log | grep -v 192.168.0.199"'
 alias fld.sectorsizes='smartctls -p | grep -e size -e "/dev/sd[a-z]:" | grep -v Disk'
-alias fld.kernlogwatchmdstat='watch -n1 "dmesg -T | tail -n 15;cat /proc/mdstat;grep "." /sys/block/md?/md/mismatch_cnt"'
+alias fld.kernlogwatchmdstat='watch -n1 "sudo dmesg -T | tail -n 15;cat /proc/mdstat;grep "." /sys/block/md?/md/mismatch_cnt"'
 alias fld.adb='~/android-x86/android-sdk-linux/platform-tools/adb'
 alias c='clear'
 alias units='units -o %.20g'
