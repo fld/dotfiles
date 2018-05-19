@@ -46,7 +46,6 @@ grep -m1 "Command line used:" iozone.log >> "$results"
 grep -B4 "iozone test complete." iozone.log | head -n3 >> "$results"
 
 # ioping
-echo -e "### ioping ###" | tee -a "$results"
 # Seek rate
 ioping -R ioping/ | tee -a "$results"
 
