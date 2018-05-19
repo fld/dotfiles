@@ -45,8 +45,8 @@ function sgb_iozlog() {
     grep -A1 -B4 "iozone test complete." iozone.log | grep -v iozone >> "$results"
 }
 echo -e "\n### Iozone ###" | tee -a "$results"
-# 1G O_SYNC test (1M block)
-"time" iozone -a -o -s 1G -r 1M 2>&1 | tee "iozone.log"
+# 1G O_SYNC write test (1M block)
+"time" iozone -i 0 -i 2 -i 4 -i 6 -i 9 -i 11 -a -o -s 1G -r 1M 2>&1 | tee "iozone.log"
 sgb_iozlog
 # Full test (1M block)
 "time" iozone -a -s "$size"G -r 1M 2>&1 | tee "iozone.log"
