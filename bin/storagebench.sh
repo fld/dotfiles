@@ -36,14 +36,17 @@ echo -e "\n### Iozone ###" | tee -a "$results"
 "time" iozone -i 0 -i 1 -i 2 -a -I -s 1G -r 1M 2>&1 | tee "iozone.log"
 grep -m1 "Command line used:" iozone.log >> "$results"
 grep -B4 "iozone test complete." iozone.log | head -n3 >> "$results"
+grep -A2 "iozone test complete." iozone.log | tail -n2 >> "$results"
 # O_DIRECT + O_SYNC
 "time" iozone -i 0 -i 1 -i 2 -a -Io -s 512M -r 1M 2>&1 | tee "iozone.log"
 grep -m1 "Command line used:" iozone.log >> "$results"
 grep -B4 "iozone test complete." iozone.log | head -n3 >> "$results"
+grep -A2 "iozone test complete." iozone.log | tail -n2 >> "$results"
 # Full buffered test
 "time" iozone -i 0 -i 1 -i 2 -a -s "$size"G -r 1M 2>&1 | tee "iozone.log"
 grep -m1 "Command line used:" iozone.log >> "$results"
 grep -B4 "iozone test complete." iozone.log | head -n3 >> "$results"
+grep -A2 "iozone test complete." iozone.log | tail -n2 >> "$results"
 
 # ioping
 # Seek rate
