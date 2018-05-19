@@ -16,7 +16,7 @@ mkdir bonnie fio ioping || exit 1
 echo -e "\n$(date) - $(uname -r) - ${size}G - $sysname: ($*)" | tee -a "$results"
 
 # Bonnie++
-echo -e "### Bonnie ###" | tee -a "$results"
+echo -e "\n### Bonnie ###" | tee -a "$results"
 sudo "time" bonnie++ -u "$USER" -s "$size"G -d bonnie/ 2>&1 | tee "bonnie.log"
 grep -v -e "...done" -e "Using uid" bonnie.log >> "$results"
 
