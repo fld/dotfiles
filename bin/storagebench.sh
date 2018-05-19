@@ -33,10 +33,10 @@ sgb_fiolog
 fio --output=fio.log --iodepth=128 --size="$size"G --directory=fio/ --name=4k-write --rw=write
 sgb_fiolog
 # 4k rand. read
-fio --output=fio.log --iodepth=128 --size="$size"G --runtime=60 --directory=fio/ --name=4k-randread --rw=randread
+fio --output=fio.log --iodepth=128 --size="$size"G --directory=fio/ --name=4k-randread --rw=randread --runtime=60
 sgb_fiolog
 # 4k rand. write
-fio --output=fio.log --iodepth=128 --size="$size"G --runtime=60 --directory=fio/ --name=4k-randwrite --rw=randwrite
+fio --output=fio.log --iodepth=128 --size="$size"G --directory=fio/ --name=4k-randwrite --rw=randwrite --runtime=60
 sgb_fiolog
 
 # Iozone
