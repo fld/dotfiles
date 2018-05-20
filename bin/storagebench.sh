@@ -3,7 +3,7 @@ results=".storagebench.log"
 
 if (( EUID == 0 )); then echo 'Do not run as root'; exit 1; fi
 if ! touch "$results"; then echo 'Need write permission'; exit 1; fi
-if ! sudo bash -c '(( EUID == 0 ))'; then echo 'Need sudo permissions'; exit 1; fi
+if ! sudo bash -c '(( EUID == 0 ))'; then echo 'Run with sudo'; exit 1; fi
 if ! sudo bash -c 'hash fio ioping bonnie++ sed awk dmidecode' 2>/dev/null; then
     sudo apt install fio ioping bonnie++ sed gawk dmidecode || exit 1
 fi
@@ -15,11 +15,17 @@ fi
 
 cpunr="$(nproc)"
 size="$(free --si -g | awk '/Mem:/{print 2*$2+1}')"
+frspace="$(df -Ph . | tail -1 | awk '{print $4}')"
 sysname="$(sudo dmidecode -t2 | grep Name | sed 's/\tProduct Name: //')"
 function sgb_wait() {
     sync
     sleep 10s # TODO: instead, wait for low io-wait%?
 }
+
+if [[ ${frspace::-1} -lt $size ]]; then
+    echo 'Not enough free space on disk!'
+    exit 1
+fi
 
 # Begin bench..
 mkdir bonnie fio ioping || exit 1
