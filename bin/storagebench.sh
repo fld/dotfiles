@@ -15,14 +15,14 @@ fi
 
 cpunr="$(nproc)"
 size="$(free --si -g | awk '/Mem:/{print 2*$2+1}')"
-frspace="$(df -Ph . | tail -1 | awk '{print $4}')"
+frspace="$(df -P -B 1G . | tail -1 | awk '{print $4}')"
 sysname="$(sudo dmidecode -t2 | grep Name | sed 's/\tProduct Name: //')"
 function sgb_wait() {
     sync
     sleep 10s # TODO: instead, wait for low io-wait%?
 }
 
-if [[ ${frspace::-1} -lt $size ]]; then
+if (( frspace < size )); then
     echo 'Not enough free space on disk!'
     exit 1
 fi
