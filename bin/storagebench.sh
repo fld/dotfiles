@@ -8,12 +8,17 @@ if ! sudo bash -c 'hash fio ioping bonnie++ sed awk dmidecode' 2>/dev/null; then
     sudo apt install fio ioping bonnie++ sed gawk dmidecode || exit 1
 fi
 
+if [[ -z $2 ]]; then
+    echo "Usage: $(basename "$0") <comments>..[notes]..[etc] ..."
+    exit 1
+fi
+
 cpunr="$(nproc)"
 size="$(free --si -g | awk '/Mem:/{print 2*$2+1}')"
 sysname="$(sudo dmidecode -t2 | grep Name | sed 's/\tProduct Name: //')"
 function sgb_wait() {
     sync
-    sleep 10s
+    sleep 10s # TODO: instead, wait for low io-wait%?
 }
 
 # Begin bench..
@@ -23,7 +28,7 @@ echo -e "\n$(date) - $(uname -r) - ${size}G - $sysname: ($*)" | tee -a "$results
 # Bonnie++
 echo -e "\n### Bonnie ###" | tee -a "$results"
 sudo "time" bonnie++ -u "$USER" -s "$size"G -d bonnie/ 2>&1 | tee "bonnie.log"
-grep -v -e "...done" -e "Using uid" bonnie.log >> "$results"
+grep -v -e "...done" -e "Using uid" -e "1.97,1.97" bonnie.log >> "$results"
 sgb_wait
 
 # fio
@@ -33,17 +38,17 @@ function sgb_fiolog() {
 }
 echo -e "\n### fio ###" | tee -a "$results"
 # 4k seq. read
-fio --output=fio.log --iodepth=128 --size="$size"G --directory=fio/ --name=4k-read --rw=read
+fio --output=fio.log --directory=fio/ --iodepth=128 --size="$size"G --name=4k-read --rw=read
 sgb_fiolog
 # 4k seq. write
-fio --output=fio.log --iodepth=128 --size="$size"G --directory=fio/ --name=4k-write --rw=write
+fio --output=fio.log --directory=fio/ --iodepth=128 --size="$size"G --name=4k-write --rw=write
 sgb_fiolog
 sgb_wait
 # 4k rand. read
-fio --output=fio.log --iodepth=128 --size="$size"G --runtime=60 --directory=fio/ --name=4k-randread --rw=randread
+fio --output=fio.log --directory=fio/ --iodepth=128 --size="$size"G --runtime=60 --name=4k-randread --rw=randread
 sgb_fiolog
 # 4k rand. write
-fio --output=fio.log --iodepth=128 --size=128M --directory=fio/ --name=4k-randwrite --rw=randwrite
+fio --output=fio.log --directory=fio/ --iodepth=128 --size="$size"G --runtime=60 --fsync=1 --name=4k-randwrite --rw=randwrite
 sgb_fiolog
 sgb_wait
 
