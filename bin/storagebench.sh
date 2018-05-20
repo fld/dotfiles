@@ -58,8 +58,7 @@ echo -e "### Iozone ###" | tee -a "$results"
 sgb_iozlog
 sgb_wait
 # Full test (1M block)
-"time" iozone -a -s "$size"G -r 1M 2>&1 | tee "iozone.log"
-#"time" iozone -i 0 -i 1 -i 2 -a -s "$size"G -r 1M 2>&1 | tee "iozone.log"
+"time" iozone -i 0 -i 1 -i 2 -a -s "$size"G -r 1M 2>&1 | tee "iozone.log"
 sgb_iozlog
 sgb_wait
 
