@@ -39,7 +39,8 @@ sgb_wait
 
 # fio
 function sgb_fiolog() {
-    grep fio.log -i -e 'write: i' -e 'read :' -e 'read:' -e 'cpu' -e 'Run' -e 'ioen' -e 'ios=' | tee -a "$results"
+    # -e 'ios=', for per-device io stats
+    grep fio.log -i -e 'write: i' -e 'read :' -e 'read:' -e 'cpu' -e 'ioen' -e 'aggrmerge=' | tee -a "$results"
     echo | tee -a "$results"
 }
 echo -e "\n### fio ###" | tee -a "$results"
