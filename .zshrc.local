@@ -167,3 +167,4 @@ alias ntp-update='sudo systemctl stop ntp; sudo ntpd -gq; sudo systemctl start n
 alias apt-get-no-proxy='apt-get -o Acquire::http::Proxy=false'
 alias screen-grml='screen -c .screenrcgrml'
 alias aga4='agp $(apt-frankensteins | cut -f1 -d " ")'
+alias flux_led='python3 /home/fld/.local/lib/python3.5/site-packages/flux_led/__main__.py'
