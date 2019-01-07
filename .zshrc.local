@@ -3,9 +3,6 @@ export HISTSIZE=1000000
 export SAVEHIST=1000000
 type nproc &>/dev/null && 
     export DEB_BUILD_OPTIONS="parallel=$(nproc)"
-if [[ $(hostname) == 'main' ]]; then
-    export LIBVIRT_DEFAULT_URI='qemu:///system'
-fi
 
 # Path
 [ -e "$HOME/bin" ] &&
@@ -16,7 +13,6 @@ fi
     export PATH="$HOME/.local/bin:$PATH"
 [ -e "$HOME/dotfiles/bin" ] &&
     export PATH="$HOME/dotfiles/bin:$PATH"
-
 # Custom / machine specific
 [ -e "$HOME/main/bin" ] &&
     export PATH="$HOME/main/bin:$PATH"
@@ -25,6 +21,10 @@ fi
 
 # Hostname-based prompt colors for grml zsh
 source $HOME/dotfiles/bin/grml-zsh-prompt-colors.sh
+
+# Libvirt
+[[ $(hostname) == 'main' ]] &&
+    export LIBVIRT_DEFAULT_URI='qemu:///system'
 
 # Heroku / Travis
 #export PATH="$HOME/.rbenv/bin:$HOME/heroku-client/bin:$PATH"
@@ -41,8 +41,8 @@ fi
 
 # zplug
 if [ ! -e $HOME/.zplug/init.zsh ]; then
-    rm -rf $HOME/.zplug
-    type wget || sudo apt install wget
+    echo "zplug: init.zsh not found. Fetching latest installer.zsh.."
+    type wget || sudo apt install wget
     zsh <(wget -O- "https://raw.githubusercontent.com/zplug/installer/master/installer.zsh")
 fi
 source $HOME/.zplug/init.zsh
@@ -118,6 +118,9 @@ alias units='units -o %.20g'
 alias mdd='sudo mdadm -D /dev/md0'
 alias mdd1='sudo mdadm -D /dev/md1'
 alias mdd2='sudo mdadm -D /dev/md2'
+alias mdd3='sudo mdadm -D /dev/md3'
+alias mdd4='sudo mdadm -D /dev/md4'
+alias mdd5='sudo mdadm -D /dev/md5'
 alias mde='sudo mdadm -E'
 alias mdx='sudo mdadm -X'
 alias mdb='sudo mdadm --examine-badblocks'
@@ -168,3 +171,4 @@ alias apt-get-no-proxy='apt-get -o Acquire::http::Proxy=false'
 alias screen-grml='screen -c .screenrcgrml'
 alias aga4='agp $(apt-frankensteins | cut -f1 -d " ")'
 alias flux_led='python3 /home/fld/.local/lib/python3.5/site-packages/flux_led/__main__.py'
+alias .o='cd /var/lib/libvirt/images'

@@ -8,12 +8,14 @@ if ping -c 1 gateway &> /dev/null; then
     type nc &> /dev/null || sudo apt install nc
     timeout 1 nc gateway 3142 &> /dev/null
     if [[ $? -eq 124 ]]; then
-        [[ -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]] ||
+        if [[ -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
+            echo "Installing 000apt-cacher-ng-proxy.."
             sudo cp ~/dotfiles/etc/apt/apt.conf.d/000apt-cacher-ng-proxy "/etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
+        fi
     fi
 fi
 
-# Install needed packages via apt & sudo
+# Install needed packages via apt
 sudo apt install zsh tmux screen git vim curl wget sed gawk grep \
     autojump exuberant-ctags urlview
 
@@ -30,15 +32,15 @@ msldst='/etc/apt/sources.list' #msldst='/etc/apt/sources.list.d/mysources.list'
 if [[ $(( slwc - mslwc )) -gt 20 || $(( mslwc - slwc )) -gt 20 ]]; then
     read -rn1 -p $'Install mysources.list to '"$msldst"$' ?\n'
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        sudo cp "$msldst" "${msldst}.bak"
-        sudo cp ~/dotfiles/etc/apt/sources.list.d/mysources.list "$msldst"
+        sudo cp "$msldst" "${msldst}.bak" &&
+        sudo cp ~/dotfiles/etc/apt/sources.list.d/mysources.list "$msldst" &&
         sudo vim "$msldst"
         sudo apt update
     fi
 fi
 
 # Install dotfiles
-echo "dotfiles:"
+echo "Installing dotfiles:"
 for file in "$PWD"/.!(|.|git*); do echo "$file"; done; echo
 read -rn1 -p $'WARNING: Write config files under: '"$HOME"$'/ (y/N):\n'
 if [[ $REPLY =~ ^[Yy]$ ]]; then
