@@ -9,7 +9,7 @@ gw_host_default='gateway'
 if ! sudo -v; then
     echo "Adding $USER to sudoers via su:"
     su -c "usermod -aG sudo $USER"
-    newgrp - sudo
+    newgrp sudo
 fi
 
 # Check if apt-cacher-ng is available at gateways port 3142
