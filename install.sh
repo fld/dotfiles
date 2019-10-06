@@ -56,9 +56,9 @@ echo "Installing dotfiles:"
 for file in "$PWD"/.!(|.|git*); do echo "$file"; done; echo
 read -rn1 -p $'WARNING: Write config files under: '"$HOME"$'/ (y/N):\n'
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-    if [[ ! -L ~/.vim ]]; then
+    if [[ -e ~/.vim && ! -L ~/.vim ]]; then
         echo "NOTE: moving old ~/.vim to ~/.vim.old"
-        mv ~/.vim ~/.vim.old 2>/dev/null
+        mv ~/.vim ~/.vim.old
     fi
     for file in "$PWD"/.!(|.|git*); do ln -sf "$file" ~; done
 fi
