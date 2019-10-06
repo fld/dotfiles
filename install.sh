@@ -9,15 +9,15 @@ gw_host_default='gateway'
 if ! sudo -v; then
     echo "Adding $USER to sudoers via su:"
     su -c "usermod -aG sudo $USER"
-    newgrp sudo
+    newgrp - sudo
 fi
 
 # Check if apt-cacher-ng is available at gateways port 3142
 gw_host="$(ip route show default | grep -m1 "default via" | cut -d ' '  -f3)"
 gw_host=${gw_host:-$gw_host_default}
-if ping -c 1 gateway &> /dev/null; then
+if ping -c 1 "$gw_host" &> /dev/null; then
     type nc &> /dev/null || sudo apt install nc
-    timeout 1 nc gateway 3142 &> /dev/null
+    timeout 1 nc "$gw_host" 3142 &> /dev/null
     if [[ $? -eq 124 ]]; then
         if [[ -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
             echo "Installing 000apt-cacher-ng-proxy.."
@@ -58,7 +58,7 @@ read -rn1 -p $'WARNING: Write config files under: '"$HOME"$'/ (y/N):\n'
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     if [[ ! -L ~/.vim ]]; then
         echo "NOTE: moving old ~/.vim to ~/.vim.old"
-        mv ~/.vim ~/.vim.old
+        mv ~/.vim ~/.vim.old 2>/dev/null
     fi
     for file in "$PWD"/.!(|.|git*); do ln -sf "$file" ~; done
 fi
