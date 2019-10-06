@@ -5,10 +5,11 @@ dotrepo='https://github.com/fld/dotfiles'
 gw_host_default='gateway'
 
 # Sudo check
-# TODO: no-sudo mode
+# TODO: support no-sudo
 if ! sudo -v; then
     echo "Adding $USER to sudoers via su:"
     su -c "usermod -aG sudo $USER"
+    echo "Logging in with sudo group.. Please re-run ./install.sh"
     newgrp sudo
 fi
 

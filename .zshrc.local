@@ -1,7 +1,7 @@
 export EDITOR=vim
 export HISTSIZE=1000000
 export SAVEHIST=1000000
-type nproc &>/dev/null && 
+type nproc &>/dev/null &&
     export DEB_BUILD_OPTIONS="parallel=$(nproc)"
 
 # Path
@@ -54,7 +54,7 @@ zplug "zdharma/history-search-multi-word" # Better ^r search
 zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
 zplug 'zplug/zplug', hook-build:'zplug --self-manage'
 if ! zplug check --verbose; then
-    printf "Install zplug? [y/N]: "
+    printf "Install zplug plugins? [y/N]: "
     if read -q; then
         echo; zplug install
     fi
@@ -62,7 +62,7 @@ fi
 zplug load
 
 # Autojump
-[ -e /usr/share/autojump/autojump.sh ] && 
+[ -e /usr/share/autojump/autojump.sh ] &&
     source /usr/share/autojump/autojump.sh
 
 # Functions
