@@ -28,7 +28,6 @@ set incsearch
 set hlsearch
 set ignorecase
 set smartcase
-set gdefault " replace (s///g) defaults to global
 set wildignore=.svn,CVS,.git,.hg,*.o,*.a,*.class,*.mo,*.la,*.so,*.obj,*.swp,*.jpg,*.png,*.xpm,*.gif,.DS_Store,*.aux,*.out,*.toc,tmp,*.scssc
 set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc
 
@@ -89,9 +88,9 @@ call plug#begin('~/.vim/plugged')
     " Heavy
     Plug 'bling/vim-airline' " powerline status-bar for vim
     "Plug 'garbas/vim-snipmate' " automatic code snippets
-    Plug 'tpope/vim-rails', { 'for': 'ruby' }
-    Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
-    Plug 'klen/python-mode', { 'for': 'python' }
+    "Plug 'tpope/vim-rails', { 'for': 'ruby' }
+    "Plug 'vim-ruby/vim-ruby', { 'for': 'ruby' }
+    "Plug 'klen/python-mode', { 'for': 'python' }
     " Old
     "Plug 'dahu/VimGym'
     "Plug 'scrooloose/syntastic'
