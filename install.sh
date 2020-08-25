@@ -20,7 +20,7 @@ if ping -c 1 "$gw_host" &> /dev/null; then
     type nc &> /dev/null || sudo apt install nc
     timeout 1 nc "$gw_host" 3142 &> /dev/null
     if [[ $? -eq 124 ]]; then
-        if [[ -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
+        if [[ ! -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
             echo "Installing 000apt-cacher-ng-proxy.."
             sudo cp ~/dotfiles/etc/apt/apt.conf.d/000apt-cacher-ng-proxy "/etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
         fi
@@ -64,10 +64,13 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     for file in "$PWD"/.!(|.|git*); do ln -sf "$file" ~; done
 fi
 
+# Change default shell
+echo -e "\\nSetting zsh as default shell.."
+chsh -s "$(command -v zsh)"
+
 # Install vim-plug
 read -rn1 -p $'Install vim-plug? (Y/n):\n'
-[[ $REPLY =~ ^[Nn]$ ]] && exec zsh
-
+if [[ $REPLY =~ ^[Yy]$ ]]; then
 echo "Updating/cleaning Vim plugins:"
 vim -E -s <<-EOF
     :source ~/.vimrc
@@ -76,8 +79,7 @@ vim -E -s <<-EOF
     :qa
 EOF
 reset
+fi
 
-# Change default shell
-echo -e "\\nSetting zsh as default shell.."
-chsh -s "$(command -v zsh)"
-exec zsh
+echo "Re-login to complete zsh install"
+exit 0
