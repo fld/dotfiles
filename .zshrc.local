@@ -40,6 +40,7 @@ if [ "$SSH_TTY" -a -f $HOME/.otpw ]; then
 fi
 
 # zplug
+# TODO: replace with zinit?
 if [ ! -e $HOME/.zplug/init.zsh ]; then
     echo "zplug: init.zsh not found. Fetching latest installer.zsh.."
     type wget || sudo apt install wget

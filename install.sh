@@ -65,7 +65,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 fi
 
 # Install vim-plug
-read -rn1 -p $'Install Vim plugins? (Y/n):\n'
+read -rn1 -p $'Install vim-plug? (Y/n):\n'
 [[ $REPLY =~ ^[Nn]$ ]] && exec zsh
 
 echo "Updating/cleaning Vim plugins:"
