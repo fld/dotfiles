@@ -1,45 +1,40 @@
 # Debian
-deb http://www.nic.funet.fi/debian/ stretch main contrib non-free 
+deb http://www.nic.funet.fi/debian/ stable main contrib non-free
 
 # Debian Security
-deb http://security.debian.org/ stretch/updates main contrib non-free 
+deb http://deb.debian.org/debian-security stable-security main contrib non-free
 
 # Debian Updates
-deb http://www.nic.funet.fi/debian/ stretch-updates main contrib non-free
+deb http://www.nic.funet.fi/debian/ stable-updates main contrib non-free
 
 # Debian Backports
-deb http://www.nic.funet.fi/debian/ stretch-backports main contrib non-free
-#deb-src http://www.nic.funet.fi/debian/ stretch-backports main contrib non-free
+deb http://www.nic.funet.fi/debian/ stable-backports main contrib non-free
+#deb-src http://www.nic.funet.fi/debian/ stable-backports main contrib non-free
+
+# wine-staging
+#deb http://dl.winehq.org/wine-builds/debian/ stable main
+# Lutris
+#deb http://download.opensuse.org/repositories/home:/strycore/Debian_10/ ./
 
 # Debian Stable [src]
 #deb-src http://www.nic.funet.fi/debian/ stable main non-free contrib
 # Debian Testing [src]
-#deb-src http://www.nic.funet.fi/debian/ testing main non-free contrib 
+#deb-src http://www.nic.funet.fi/debian/ testing main non-free contrib
 # Debian Unstable [src]
-#deb-src http://www.nic.funet.fi/debian/ sid main non-free contrib 
+#deb-src http://www.nic.funet.fi/debian/ sid main non-free contrib
 # Debian Experimental [src]
 #deb-src http://www.nic.funet.fi/debian/ experimental main non-free contrib
+# Upstream LLVM Toolchain
+#deb http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye main
+#deb-src http://apt.llvm.org/bullseye/ llvm-toolchain-bullseye main
 
 # Tor
-#deb http://deb.torproject.org/torproject.org stretch main
+#deb http://deb.torproject.org/torproject.org stable main
 # i2p - The Invisible Internet Project
-#deb http://deb.i2p2.no/ stretch main
+#deb http://deb.i2p2.no/ stable main
 # Weechat
-#deb http://debian.weechat.org stretch main
-
-# wine-staging
-#deb http://dl.winehq.org/wine-builds/debian/ stretch main
-# PlayOnLinux
-#deb http://deb.playonlinux.com/ stretch main
-# Lutris - Open gaming platform
-#deb http://download.opensuse.org/repositories/home:/strycore/Debian_9.0/ ./
-# Albert - A fast and flexible keyboard launcher
-#deb http://repo.adminlounge.org/ stretch main
-
-# Debian Multimedia
-#deb http://ftp.deb-multimedia.org/ stable main non-free 
+#deb http://debian.weechat.org stable main
 # Grml
-#deb http://deb.grml.org/ grml-stable main 
-# LLVM Toolchain - apt.llvm.org
-#deb http://apt.llvm.org/stretch/ llvm-toolchain-4.0 main
-#deb http://apt.llvm.org/stretch/ llvm-toolchain-5.0 main
+#deb http://deb.grml.org/ grml-stable main
+# Albert - A fast and flexible keyboard launcher
+#deb http://repo.adminlounge.org/ stable main

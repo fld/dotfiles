@@ -119,7 +119,10 @@ alias dfh='df -lh | grep -v -e tmpfs -e udev | sort -hk2; comm --nocheck-order -
 alias dfha='df -lh | sort -hk2; comm -13 <(df -lh) <(df -h)'
 alias dfhu='df -lh | grep -v -e tmpfs -e udev | sort -hk5; echo -; comm --nocheck-order -13 <(df -lh) <(df -h) | sort -hk5'
 alias aliases='grep -e "^alias" ~/.bashrc ~/.zshrc ~/.zshrc.local'
-alias lvvgs='(sudo vgs; sudo lvs) 2>&1 | grep -v "No such device"'
+alias lvvgs='(sudo pvs; sudo vgs; sudo lvs) 2>&1 | grep -v "No such device"'
+alias lsscsifull='(lsscsi -H; lsscsi; lsscsi -dl)'
+alias lsblk='sudo lsblk'
+alias blkid='sudo blkid'
 
 # Stats aliases
 alias d1='sudo dmesg -Tw'
