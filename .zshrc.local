@@ -39,8 +39,10 @@ if [[ ! -e $HOME/.zplug || -w $HOME/.zplug ]]; then
     if [ ! -e $HOME/.zplug/init.zsh ]; then
         echo "zplug: init.zsh not found. Fetching latest installer.zsh.."
         hash wget || sudo apt install wget
+        wget -O- "https://raw.githubusercontent.com/zplug/installer/master/installer.zsh" | zsh
         #zsh <(wget -O- "https://raw.githubusercontent.com/zplug/installer/master/installer.zsh")
-        zsh -c "$(wget -O- 'https://raw.githubusercontent.com/zplug/installer/master/installer.zsh')"
+        #zsh -c "$(wget -O- 'https://raw.githubusercontent.com/zplug/installer/master/installer.zsh')"
+        
     fi
     source $HOME/.zplug/init.zsh
     zplug "tmux-plugins/tpm" # tmux plugin manager
