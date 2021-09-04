@@ -1,7 +1,7 @@
 export EDITOR=vim
 export HISTSIZE=1000000
 export SAVEHIST=1000000
-type nproc &>/dev/null &&
+hash nproc &&
     export DEB_BUILD_OPTIONS="parallel=$(nproc)"
 
 # Path
@@ -26,12 +26,6 @@ source $HOME/dotfiles/bin/grml-zsh-prompt-colors.sh
 [[ $(hostname) == 'main' ]] &&
     export LIBVIRT_DEFAULT_URI='qemu:///system'
 
-# Heroku / Travis
-#export PATH="$HOME/.rbenv/bin:$HOME/heroku-client/bin:$PATH"
-#eval "$(rbenv init -)"
-#[ -f ~/.travis/travis.sh ] &&
-#    source ~/.travis/travis.sh
-
 # OTPW
 if [ "$SSH_TTY" -a -f $HOME/.otpw ]; then
   PW_LINES=$(wc -l <$HOME/.otpw)
@@ -40,27 +34,31 @@ if [ "$SSH_TTY" -a -f $HOME/.otpw ]; then
 fi
 
 # zplug
-# TODO: replace with zinit?
-if [ ! -e $HOME/.zplug/init.zsh ]; then
-    echo "zplug: init.zsh not found. Fetching latest installer.zsh.."
-    type wget || sudo apt install wget
-    zsh <(wget -O- "https://raw.githubusercontent.com/zplug/installer/master/installer.zsh")
-fi
-source $HOME/.zplug/init.zsh
-zplug "tmux-plugins/tpm" # tmux plugin manager
-zplug "plugins/git", from:oh-my-zsh # GIT aliases
-zplug "micrenda/zsh-nohup" # ^h for backgrounding
-zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
-zplug "zdharma/history-search-multi-word" # Better ^r search
-zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
-zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-if ! zplug check --verbose; then
-    printf "Install zplug plugins? [y/N]: "
-    if read -q; then
-        echo; zplug install
+# TODO: replace with zinit
+if [ -w $HOME/.zplug ]; then
+    if [ ! -e $HOME/.zplug/init.zsh ]; then
+        echo "zplug: init.zsh not found. Fetching latest installer.zsh.."
+        hash wget || sudo apt install wget
+        zsh <(wget -O- "https://raw.githubusercontent.com/zplug/installer/master/installer.zsh")
     fi
+    source $HOME/.zplug/init.zsh
+    zplug "tmux-plugins/tpm" # tmux plugin manager
+    zplug "plugins/git", from:oh-my-zsh # GIT aliases
+    zplug "micrenda/zsh-nohup" # ^h for backgrounding
+    zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
+    zplug "zdharma/history-search-multi-word" # Better ^r search
+    zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
+    zplug 'zplug/zplug', hook-build:'zplug --self-manage'
+    if ! zplug check --verbose; then
+        printf "Install zplug plugins? [y/N]: "
+        if read -q; then
+            echo; zplug install
+        fi
+    fi
+    zplug load
+else
+    echo "zplug: ERROR: $HOME/.zplug not writable. Stopping installation!"
 fi
-zplug load
 
 # Autojump
 [ -e /usr/share/autojump/autojump.sh ] &&
