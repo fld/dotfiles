@@ -35,7 +35,7 @@ fi
 
 # zplug
 # TODO: replace with zinit
-if [ -w $HOME/.zplug ]; then
+if [[ ! -e $HOME/.zplug || -w $HOME/.zplug ]]; then
     if [ ! -e $HOME/.zplug/init.zsh ]; then
         echo "zplug: init.zsh not found. Fetching latest installer.zsh.."
         hash wget || sudo apt install wget
