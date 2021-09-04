@@ -14,10 +14,11 @@ if ! sudo -v; then
 fi
 
 # Check if apt-cacher-ng is available at gateways port 3142
+# TODO: ip/ping check
 gw_host="$(ip route show default | grep -m1 "default via" | cut -d ' '  -f3)"
 gw_host=${gw_host:-$gw_host_default}
 if ping -c 1 "$gw_host" &> /dev/null; then
-    type nc &> /dev/null || sudo apt install nc
+    hash nc || sudo apt install nc
     timeout 1 nc "$gw_host" 3142 &> /dev/null
     if [[ $? -eq 124 ]]; then
         if [[ ! -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
@@ -36,7 +37,7 @@ sudo apt install zsh tmux screen git vim curl wget sed gawk grep \
 [[ -d ~/dotfiles ]] || git clone "$dotrepo"
 cd ~/dotfiles || exit 1
 echo "Pulling latest origin/master..."
-git pull origin master;echo
+git pull --no-rebase origin master;echo
 
 # Ask to install mysources.list as sources.list (if wordcount-Δ >20)
 slwc=$(wc -w /etc/apt/sources.list | cut -d' ' -f1)
