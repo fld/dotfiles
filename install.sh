@@ -2,7 +2,6 @@
 shopt -s extglob # BASH Extended Globbing
 
 dotrepo='https://github.com/fld/dotfiles'
-gw_host_default='gateway'
 
 # Sudo check
 # TODO: support no-sudo
@@ -13,23 +12,16 @@ if ! sudo -v; then
     newgrp sudo
 fi
 
-# Check if apt-cacher-ng is available at gateways port 3142
-# TODO: ip/ping check
-gw_host="$(ip route show default | grep -m1 "default via" | cut -d ' '  -f3)"
-gw_host=${gw_host:-$gw_host_default}
-if ping -c 1 "$gw_host" &> /dev/null; then
-    hash nc || sudo apt install nc
-    timeout 1 nc "$gw_host" 3142 &> /dev/null
-    if [[ $? -eq 124 ]]; then
-        if [[ ! -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
-            echo "Installing 000apt-cacher-ng-proxy.."
-            sudo cp ~/dotfiles/etc/apt/apt.conf.d/000apt-cacher-ng-proxy "/etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
-        fi
+# Set apt cache proxy address
+if [[ ! -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
+    read -rn1 -p $'Install 000apt-cacher-ng-proxy under /etc/apt/apt.conf.d/ ?\n'
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "Installing 000apt-cacher-ng-proxy.."
+        sudo cp ~/dotfiles/etc/apt/apt.conf.d/000apt-cacher-ng-proxy "/etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
     fi
 fi
 
 # Install needed packages via apt
-# TODO: list what the system has
 sudo apt install zsh tmux screen git vim curl wget sed gawk grep \
     autojump exuberant-ctags urlview
 
@@ -37,6 +29,7 @@ sudo apt install zsh tmux screen git vim curl wget sed gawk grep \
 [[ -d ~/dotfiles ]] || git clone "$dotrepo"
 cd ~/dotfiles || exit 1
 echo "Pulling latest origin/master..."
+# TODO: proper arguments
 git pull --no-rebase origin master;echo
 
 # Ask to install mysources.list as sources.list (if wordcount-Δ >20)
@@ -54,6 +47,7 @@ if [[ $(( slwc - mslwc )) -gt 20 || $(( mslwc - slwc )) -gt 20 ]]; then
 fi
 
 # Install dotfiles
+# TODO: handle existing files
 echo "Installing dotfiles:"
 for file in "$PWD"/.!(|.|git*); do echo "$file"; done; echo
 read -rn1 -p $'WARNING: Write config files under: '"$HOME"$'/ (y/N):\n'
