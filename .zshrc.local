@@ -48,7 +48,7 @@ else
     zplug "plugins/git", from:oh-my-zsh # GIT aliases
     zplug "micrenda/zsh-nohup" # ^h for backgrounding
     zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
-    zplug "zdharma/history-search-multi-word" # Better ^r search
+    zplug "zdharma-continuum/history-search-multi-word" # Better ^r search
     zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
     zplug 'zplug/zplug', hook-build:'zplug --self-manage'
     if ! zplug check --verbose; then
