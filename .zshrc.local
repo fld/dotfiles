@@ -7,12 +7,12 @@ hash nproc &&
 # Path
 [ -e "$HOME/bin" ] &&
     export PATH="$HOME/bin:$PATH"
-[ -e "$HOME/local/bin" ] &&
-    export PATH="$HOME/local/bin:$PATH"
 [ -e "$HOME/.local/bin" ] &&
     export PATH="$HOME/.local/bin:$PATH"
 [ -e "$HOME/dotfiles/bin" ] &&
     export PATH="$HOME/dotfiles/bin:$PATH"
+[ -e "$HOME/.emacs.d/bin" ] &&
+    export PATH="$HOME/.emacs.d/bin:$PATH"
 # Custom / machine specific
 [ -e "$HOME/main/bin" ] &&
     export PATH="$HOME/main/bin:$PATH"
@@ -184,7 +184,7 @@ alias poweronhours='for d in /dev/sd?; do echo -n $d; sudo smartctl -A $d | grep
 # Shell management aliases
 alias sourcezshrc='source ~/.zshrc'
 alias zshrc='vim ~/.zshrc.local;sourcezshrc'
-alias update-grml-zshrc='wget -O ~/dotfiles/.zshrc.new https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc; vimdiff ~/.zshrc ~/dotfiles/.zshrc.new && mv ~/dotfiles/.zshrc.new ~/dotfiles/.zshrc'
+alias update-grml-zshrc='wget -O ~/dotfiles/.zshrc.new https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc; vimdiff ~/.zshrc ~/dotfiles/.zshrc.new && mv ~/dotfiles/.zshrc ~/dotfiles/.zshrc.old && mv ~/dotfiles/.zshrc.new ~/dotfiles/.zshrc'
 alias update-zplug='zplug update;zplug clean'
 alias update-tpm='~/.tmux/plugins/tpm/bin/update_plugins all'
 alias update-vim='echo "To update vim-plug: Run Vim. Use \":PlugUpgrade | :PlugUpdate\""'

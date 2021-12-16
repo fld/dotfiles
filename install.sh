@@ -3,6 +3,8 @@ shopt -s extglob # BASH Extended Globbing
 
 dotrepo='https://github.com/fld/dotfiles'
 
+# TODO: rPi version
+
 # Sudo check
 # TODO: support no-sudo
 if ! sudo -v; then

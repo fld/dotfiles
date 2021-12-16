@@ -481,6 +481,7 @@ setopt unset
 
 # setting some default values
 NOCOR=${NOCOR:-0}
+NOETCHOSTS=${NOETCHOSTS:-0}
 NOMENU=${NOMENU:-0}
 NOPRECMD=${NOPRECMD:-0}
 COMMAND_NOT_FOUND=${COMMAND_NOT_FOUND:-0}
@@ -893,7 +894,7 @@ function grmlcomp () {
     if is42 ; then
         [[ -r ~/.ssh/config ]] && _ssh_config_hosts=(${${(s: :)${(ps:\t:)${${(@M)${(f)"$(<$HOME/.ssh/config)"}:#Host *}#Host }}}:#*[*?]*}) || _ssh_config_hosts=()
         [[ -r ~/.ssh/known_hosts ]] && _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
-        [[ -r /etc/hosts ]] && : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
+        [[ -r /etc/hosts ]] && [[ "$NOETCHOSTS" -eq 0 ]] && : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(grep -v '^0\.0\.0.\0\|^127\.0\.0\.1\|^::1 ' /etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
     else
         _ssh_config_hosts=()
         _ssh_hosts=()
@@ -2572,7 +2573,7 @@ function grml_reset_screen_title () {
     # see http://www.faqs.org/docs/Linux-mini/Xterm-Title.html
     [[ ${NOTITLE:-} -gt 0 ]] && return 0
     case $TERM in
-        (xterm*|rxvt*|alacritty)
+        (xterm*|rxvt*|alacritty|foot)
             set_title ${(%):-"%n@%m: %~"}
             ;;
     esac
@@ -2609,7 +2610,7 @@ function grml_cmd_to_screen_title () {
 
 function grml_control_xterm_title () {
     case $TERM in
-        (xterm*|rxvt*|alacritty)
+        (xterm*|rxvt*|alacritty|foot)
             set_title "${(%):-"%n@%m:"}" "$2"
             ;;
     esac
@@ -2674,6 +2675,11 @@ else
     alias ll='command ls -l'
     alias lh='command ls -hAl'
     alias l='command ls -l'
+fi
+
+# use ip from iproute2 with color support
+if ip --color=auto addr show dev lo >/dev/null 2>&1; then
+    alias ip='command ip --color=auto'
 fi
 
 if [[ -r /proc/mdstat ]]; then
@@ -3307,7 +3313,14 @@ zrcautoload lookupinit && lookupinit
 # variables
 
 # set terminal property (used e.g. by msgid-chooser)
-export COLORTERM="yes"
+case "${COLORTERM}" in
+  truecolor)
+    # do not overwrite
+    ;;
+  *)
+    export COLORTERM="yes"
+    ;;
+esac
 
 # aliases
 
