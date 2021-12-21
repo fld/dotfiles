@@ -83,7 +83,7 @@ bgp() { $@ &>/dev/null & disown; }
 title() { echo -en "\033]2;$1\007"; }
 fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
 inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
-backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"'; }
+backuppcwatch() { sudo watch 'lsof -n -u backuppc | egrep " (REG|DIR) " | egrep -v "( (mem|txt|cwd|rtd) |/LOG)" | awk "{print $9}"; df -h'; }
 iommugroups() {
     find /sys/kernel/iommu_groups -maxdepth 1 -mindepth 1 -type d -exec \
         bash -c 'i="$1"; echo "### Group ${i##*/} ###";
