@@ -33,32 +33,24 @@ if [ "$SSH_TTY" -a -f $HOME/.otpw ]; then
   echo "OTPW: $PW_USED/`echo $PW_LINES-2 | bc` used"
 fi
 
-# zplug
-# TODO: replace with zinit
-export ZPLUG_HOME=$HOME/.zplug
-if [[ -e $ZPLUG_HOME && ! -w $ZPLUG_HOME ]]; then
-    echo "zplug: ERROR: $ZPLUG_HOME not writable. Stopping installation!"
-else
-    if [ ! -e $ZPLUG_HOME/init.zsh ]; then
-        echo "zplug: init.zsh not found. Fetching latest zplug.."
-        git clone https://github.com/zplug/zplug "$ZPLUG_HOME"
+# zinit
+export ZINIT_HOME=$HOME/.zinit
+if [[ ! -e $ZINIT_HOME/zinit.zsh ]]; then
+    if [[ ! -w $ZINIT_HOME ]]; then
+        echo "zinit: ERROR: $ZINIT_HOME not writable. Stopping installation!"
+    else
+        git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
     fi
-    source "$ZPLUG_HOME/init.zsh"
-    zplug "tmux-plugins/tpm" # tmux plugin manager
-    zplug "plugins/git", from:oh-my-zsh # GIT aliases
-    zplug "micrenda/zsh-nohup" # ^h for backgrounding
-    zplug "MichaelAquilina/zsh-you-should-use" # Remind about aliases
-    zplug "zdharma-continuum/history-search-multi-word" # Better ^r search
-    zplug "zsh-users/zsh-syntax-highlighting" # Color prompt
-    zplug 'zplug/zplug', hook-build:'zplug --self-manage'
-    if ! zplug check --verbose; then
-        printf "Install zplug plugins? [y/N]: "
-        if read -q; then
-            echo; zplug install
-        fi
-    fi
-    zplug load
 fi
+source "$ZINIT_HOME/zinit.zsh"
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+zinit snippet OMZP::git # oh-my-zsh git aliases
+zinit load tmux-plugins/tpm # tmux plugin manager
+zinit load micrenda/zsh-nohup # ^h for backgrounding
+zinit load MichaelAquilina/zsh-you-should-use # Remind about aliases
+zinit load zdharma-continuum/history-search-multi-word # better ^r search
+zinit load zsh-users/zsh-syntax-highlighting # Color prompt
 
 # Autojump
 [ -e /usr/share/autojump/autojump.sh ] &&
@@ -88,7 +80,6 @@ systemd-nspawn-wip() { command sudo systemd-nspawn ${^ns_dotfiles} $@; } # man z
 doc() { [[ -d "/usr/share/doc/$1" ]] && vim "/usr/share/doc/$1" || ls -lh /usr/share/doc/$1*; }
 mkalias() { name=$1;shift;echo "alias $name='$*'" >> ~/.zshrc.local;source ~/.zshrc.local;tail -n1 ~/.zshrc.local; }
 bgp() { $@ &>/dev/null & disown; }
-md5() { echo -n "$1" | md5sum; }
 title() { echo -en "\033]2;$1\007"; }
 fe() { find . -iname '*'"$1"'*' -exec $2 {} \; ; }  # find a file and run $2 on it
 inotifylist() { sudo ps -p $(find /proc/*/fd/* -type l -lname 'anon_inode:inotify' -print 2> /dev/null | sed -e 's/^\/proc\/\([0-9]*\)\/.*/\1/') }
@@ -185,7 +176,7 @@ alias poweronhours='for d in /dev/sd?; do echo -n $d; sudo smartctl -A $d | grep
 alias sourcezshrc='source ~/.zshrc'
 alias zshrc='vim ~/.zshrc.local;sourcezshrc'
 alias update-grml-zshrc='wget -O ~/dotfiles/.zshrc.new https://git.grml.org/f/grml-etc-core/etc/zsh/zshrc; vimdiff ~/.zshrc ~/dotfiles/.zshrc.new && mv ~/dotfiles/.zshrc ~/dotfiles/.zshrc.old && mv ~/dotfiles/.zshrc.new ~/dotfiles/.zshrc'
-alias update-zplug='zplug update;zplug clean'
+alias update-zinit='zinit update'
 alias update-tpm='~/.tmux/plugins/tpm/bin/update_plugins all'
 alias update-vim='echo "To update vim-plug: Run Vim. Use \":PlugUpgrade | :PlugUpdate\""'
 alias update-dotfiles='git -C ~/dotfiles pull origin master; sourcezshrc'
