@@ -127,6 +127,7 @@ alias ports='netstat -tulanp'
 alias firewall='sudo /sbin/iptables -L -n -v --line-numbers'
 alias smblistusers='sudo pdbedit -L -v'
 alias cifsumount='sudo umount -a -t cifs -l'
+alias whatsmyip='host myip.opendns.com resolver1.opendns.com'
 
 # Debian aliases
 alias apt-frankensteins='apt-show-versions | grep -e "testing" -e "unstable" -e "/sid" -e "*manually*" -e "No available" -e "newer than"'
