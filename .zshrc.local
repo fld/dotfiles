@@ -36,17 +36,18 @@ fi
 # zinit
 export ZINIT_HOME=$HOME/.zinit
 if [[ ! -e $ZINIT_HOME/zinit.zsh ]]; then
-    if [[ ! -w $ZINIT_HOME ]]; then
-        echo "zinit: ERROR: $ZINIT_HOME not writable. Stopping installation!"
+    if [[ ! -w $HOME ]]; then
+        echo "zinit: ERROR: $HOME not writable. Stopping installation!"
     else
-        git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+        git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME" ||
+            echo "zinit: ERROR: git cloning zinit failed! Stopping installation!"
     fi
 fi
 source "$ZINIT_HOME/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 zinit snippet OMZP::git # oh-my-zsh git aliases
-zinit load tmux-plugins/tpm # tmux plugin manager
+zinit light tmux-plugins/tpm # tmux plugin manager
 zinit load micrenda/zsh-nohup # ^h for backgrounding
 zinit load MichaelAquilina/zsh-you-should-use # Remind about aliases
 zinit load zdharma-continuum/history-search-multi-word # better ^r search
