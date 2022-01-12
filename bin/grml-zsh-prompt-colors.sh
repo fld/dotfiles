@@ -33,4 +33,7 @@ elif [[ $(hostname) == "stalux" ]]; then
     zstyle ':prompt:grml:left:items:at' pre '%B%F{blue}'
     zstyle ':prompt:grml:left:items:host' pre '%F{blue}'
     zstyle ':prompt:grml:left:items:path' pre '%F{green}'
+elif [[ -e '/etc/debian_chroot' ]]; then
+    zstyle ':prompt:grml:left:items:host' pre '%F{blue}'
+    zstyle ':prompt:grml:left:items:at' pre '%B%F{blue}'
 fi
