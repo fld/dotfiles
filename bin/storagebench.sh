@@ -16,7 +16,8 @@ fi
 cpunr="$(nproc)"
 size="$(free --si -g | awk '/Mem:/{print 2*$2+1}')"
 frspace="$(df -P -B 1G . | tail -1 | awk '{print $4}')"
-sysname="$(sudo dmidecode -t2 | grep Name | sed 's/\tProduct Name: //')"
+sysname="$(cat /sys/class/dmi/id/board_name)"
+#sysname="$(sudo dmidecode -t2 | grep Name | sed 's/\tProduct Name: //')"
 function sgb_wait() {
     sync
     sleep 10s # TODO: instead, wait for low io-wait%?
