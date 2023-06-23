@@ -28,6 +28,9 @@ elif [[ $(hostname) == "acer" ]]; then
 elif [[ $(hostname) =~ "rpi" ]]; then
     zstyle ':prompt:grml:left:items:user' pre '%F{red}'
     zstyle ':prompt:grml:left:items:host' pre '%F{green}'
+elif [[ $(hostname) =~ "op5" ]]; then 
+    zstyle ':prompt:grml:left:items:user' pre '%B%F{yellow}'
+    zstyle ':prompt:grml:left:items:host' pre '%F{yellow}'
 elif [[ $(hostname) == "stalux" ]]; then
     zstyle ':prompt:grml:left:items:user' pre '%B%F{blue}'
     zstyle ':prompt:grml:left:items:at' pre '%B%F{blue}'
