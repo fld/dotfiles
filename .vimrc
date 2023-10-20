@@ -48,7 +48,7 @@ autocmd VimEnter COMMIT_EDITMSG setlocal filetype=gitcommit
 autocmd Filetype mail,gitcommit,gitsendemail setlocal textwidth=72 spell
 
 " Visual
-colorscheme delek
+colorscheme slate
 if has("gui_running")
     colorscheme codeschool
     set guioptions-=T
