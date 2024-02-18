@@ -9,7 +9,7 @@ dotrepo='https://github.com/fld/dotfiles'
 # TODO: support no-sudo
 if ! sudo -v; then
     echo "Adding $USER to sudoers via su:"
-    su -c "usermod -aG sudo $USER"
+    su -c "/sbin/usermod -aG sudo $USER"
     echo "Joining sudo group.. Please re-run ./install.sh"
     newgrp sudo
 fi
