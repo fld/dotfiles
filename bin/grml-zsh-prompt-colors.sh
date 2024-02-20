@@ -8,7 +8,7 @@ elif [[ $(hostname) == "nas" ]]; then
     zstyle ':prompt:grml:left:items:user' pre '%B%F{green}'
     zstyle ':prompt:grml:left:items:at' pre '%F{green}'
     zstyle ':prompt:grml:left:items:host' pre '%F{red}'
-    zstyle ':prompt:grml:left:items:path' pre '%B%F{blue}'
+    zstyle ':prompt:grml:left:items:path' pre '%F{gray}'
 elif [[ $(hostname) == "ha" ]]; then
     zstyle ':prompt:grml:left:items:user' pre '%F{green}'
     zstyle ':prompt:grml:left:items:at' pre '%B%F{blue}'
