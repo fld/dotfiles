@@ -14,15 +14,6 @@ if ! sudo -v; then
     newgrp sudo
 fi
 
-# Set apt cache proxy address
-if [[ ! -f /etc/apt/apt.conf.d/000apt-cacher-ng-proxy ]]; then
-    read -rn1 -p $'Install 000apt-cacher-ng-proxy under /etc/apt/apt.conf.d/ ?\n'
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "Installing 000apt-cacher-ng-proxy.."
-        sudo cp ~/dotfiles/etc/apt/apt.conf.d/000apt-cacher-ng-proxy "/etc/apt/apt.conf.d/000apt-cacher-ng-proxy"
-    fi
-fi
-
 # Install needed packages via apt
 sudo apt install zsh tmux screen git vim curl wget sed gawk grep \
     autojump exuberant-ctags urlview
