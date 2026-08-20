@@ -15,3 +15,5 @@
     insteadOf = kde:
 [url "git@git.kde.org:"]
     pushInsteadOf = kde:
+[credential]
+	helper = cache

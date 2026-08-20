@@ -170,56 +170,6 @@ EOF
 # load .zshrc.pre to give the user the chance to overwrite the defaults
 [[ -r ${ZDOTDIR:-${HOME}}/.zshrc.pre ]] && source ${ZDOTDIR:-${HOME}}/.zshrc.pre
 
-# check for version/system
-# check for versions (compatibility reasons)
-function is51 () {
-    [[ $ZSH_VERSION == 5.<1->* ]] && return 0
-    return 1
-}
-
-function is4 () {
-    [[ $ZSH_VERSION == <4->* ]] && return 0
-    return 1
-}
-
-function is41 () {
-    [[ $ZSH_VERSION == 4.<1->* || $ZSH_VERSION == <5->* ]] && return 0
-    return 1
-}
-
-function is42 () {
-    [[ $ZSH_VERSION == 4.<2->* || $ZSH_VERSION == <5->* ]] && return 0
-    return 1
-}
-
-function is425 () {
-    [[ $ZSH_VERSION == 4.2.<5->* || $ZSH_VERSION == 4.<3->* || $ZSH_VERSION == <5->* ]] && return 0
-    return 1
-}
-
-function is43 () {
-    [[ $ZSH_VERSION == 4.<3->* || $ZSH_VERSION == <5->* ]] && return 0
-    return 1
-}
-
-function is433 () {
-    [[ $ZSH_VERSION == 4.3.<3->* || $ZSH_VERSION == 4.<4->* \
-                                 || $ZSH_VERSION == <5->* ]] && return 0
-    return 1
-}
-
-function is437 () {
-    [[ $ZSH_VERSION == 4.3.<7->* || $ZSH_VERSION == 4.<4->* \
-                                 || $ZSH_VERSION == <5->* ]] && return 0
-    return 1
-}
-
-function is439 () {
-    [[ $ZSH_VERSION == 4.3.<9->* || $ZSH_VERSION == 4.<4->* \
-                                 || $ZSH_VERSION == <5->* ]] && return 0
-    return 1
-}
-
 #f1# Checks whether or not you're running grml
 function isgrml () {
     [[ -f /etc/grml_version ]] && return 0
@@ -262,10 +212,6 @@ function isopenbsd () {
     [[ $GRML_OSTYPE == "OpenBSD" ]]
 }
 
-function issolaris () {
-    [[ $GRML_OSTYPE == "SunOS" ]]
-}
-
 #f1# are we running within an utf environment?
 function isutfenv () {
     case "$LANG $CHARSET $LANGUAGE" in
@@ -278,32 +224,21 @@ function isutfenv () {
 # check for user, if not running as root set $SUDO to sudo
 (( EUID != 0 )) && SUDO='sudo' || SUDO=''
 
-# change directory to home on first invocation of zsh
-# important for rungetty -> autologin
-# Thanks go to Bart Schaefer!
-isgrml && function checkhome () {
-    if [[ -z "$ALREADY_DID_CD_HOME" ]] ; then
-        export ALREADY_DID_CD_HOME=$HOME
-        cd
-    fi
-}
+# check for zsh v5.1+
 
-# check for zsh v3.1.7+
-
-if ! [[ ${ZSH_VERSION} == 3.1.<7->*      \
-     || ${ZSH_VERSION} == 3.<2->.<->*    \
-     || ${ZSH_VERSION} == <4->.<->*   ]] ; then
+if ! [[ ${ZSH_VERSION} == 5.<1->*        \
+     || ${ZSH_VERSION} == <6->.<->*   ]] ; then
 
     printf '-!-\n'
-    printf '-!- In this configuration we try to make use of features, that only\n'
-    printf '-!- require version 3.1.7 of the shell; That way this setup can be\n'
+    printf '-!- In this configuration we try to make use of features, that\n'
+    printf '-!- require version 5.1 of the shell; That way this setup can be\n'
     printf '-!- used with a wide range of zsh versions, while using fairly\n'
     printf '-!- advanced features in all supported versions.\n'
     printf '-!-\n'
     printf '-!- However, you are running zsh version %s.\n' "$ZSH_VERSION"
     printf '-!-\n'
     printf '-!- While this *may* work, it might as well fail.\n'
-    printf '-!- Please consider updating to at least version 3.1.7 of zsh.\n'
+    printf '-!- Please consider updating to at least version 5.1 of zsh.\n'
     printf '-!-\n'
     printf '-!- DO NOT EXPECT THIS TO WORK FLAWLESSLY!\n'
     printf '-!- If it does today, you'\''ve been lucky.\n'
@@ -330,90 +265,12 @@ function zrcautoload () {
     done
 
     (( ffound == 0 )) && return 1
-    if [[ $ZSH_VERSION == 3.1.<6-> || $ZSH_VERSION == <4->* ]] ; then
-        autoload -U ${ffile} || return 1
-    else
-        autoload ${ffile} || return 1
-    fi
+    autoload -U ${ffile} || return 1
     return 0
 }
 
-# The following is the ‘add-zsh-hook’ function from zsh upstream. It is
-# included here to make the setup work with older versions of zsh (prior to
-# 4.3.7) in which this function had a bug that triggers annoying errors during
-# shell startup. This is exactly upstreams code from f0068edb4888a4d8fe94def,
-# with just a few adjustments in coding style to make the function look more
-# compact. This definition can be removed as soon as we raise the minimum
-# version requirement to 4.3.7 or newer.
-function add-zsh-hook () {
-    # Add to HOOK the given FUNCTION.
-    # HOOK is one of chpwd, precmd, preexec, periodic, zshaddhistory,
-    # zshexit, zsh_directory_name (the _functions subscript is not required).
-    #
-    # With -d, remove the function from the hook instead; delete the hook
-    # variable if it is empty.
-    #
-    # -D behaves like -d, but pattern characters are active in the function
-    # name, so any matching function will be deleted from the hook.
-    #
-    # Without -d, the FUNCTION is marked for autoload; -U is passed down to
-    # autoload if that is given, as are -z and -k. (This is harmless if the
-    # function is actually defined inline.)
-    emulate -L zsh
-    local -a hooktypes
-    hooktypes=(
-        chpwd precmd preexec periodic zshaddhistory zshexit
-        zsh_directory_name
-    )
-    local usage="Usage: $0 hook function\nValid hooks are:\n  $hooktypes"
-    local opt
-    local -a autoopts
-    integer del list help
-    while getopts "dDhLUzk" opt; do
-        case $opt in
-        (d) del=1 ;;
-        (D) del=2 ;;
-        (h) help=1 ;;
-        (L) list=1 ;;
-        ([Uzk]) autoopts+=(-$opt) ;;
-        (*) return 1 ;;
-        esac
-    done
-    shift $(( OPTIND - 1 ))
-    if (( list )); then
-        typeset -mp "(${1:-${(@j:|:)hooktypes}})_functions"
-        return $?
-    elif (( help || $# != 2 || ${hooktypes[(I)$1]} == 0 )); then
-        print -u$(( 2 - help )) $usage
-        return $(( 1 - help ))
-    fi
-    local hook="${1}_functions"
-    local fn="$2"
-    if (( del )); then
-        # delete, if hook is set
-        if (( ${(P)+hook} )); then
-            if (( del == 2 )); then
-                set -A $hook ${(P)hook:#${~fn}}
-            else
-                set -A $hook ${(P)hook:#$fn}
-            fi
-            # unset if no remaining entries --- this can give better
-            # performance in some cases
-            if (( ! ${(P)#hook} )); then
-                unset $hook
-            fi
-        fi
-    else
-        if (( ${(P)+hook} )); then
-            if (( ${${(P)hook}[(I)$fn]} == 0 )); then
-                set -A $hook ${(P)hook} $fn
-            fi
-        else
-            set -A $hook $fn
-        fi
-        autoload $autoopts -- $fn
-    fi
-}
+# Autoload zsh's hook system early, so we can use it whenever we need.
+zrcautoload add-zsh-hook || add-zsh-hook () { :; }
 
 # Load is-at-least() for more precise version checks Note that this test will
 # *always* fail, if the is-at-least function could not be marked for
@@ -427,7 +284,7 @@ zrcautoload is-at-least || function is-at-least () { return 1 }
 setopt append_history
 
 # import new commands from the history file also in other zsh-session
-is4 && setopt share_history
+setopt share_history
 
 # save each command's beginning timestamp and the duration to the history file
 setopt extended_history
@@ -483,6 +340,7 @@ setopt unset
 NOCOR=${NOCOR:-0}
 NOETCHOSTS=${NOETCHOSTS:-0}
 NOMENU=${NOMENU:-0}
+NOPATHHELPER=${NOPATHHELPER:-0}
 NOPRECMD=${NOPRECMD:-0}
 COMMAND_NOT_FOUND=${COMMAND_NOT_FOUND:-0}
 GRML_ZSH_CNF_HANDLER=${GRML_ZSH_CNF_HANDLER:-/usr/share/command-not-found/command-not-found}
@@ -622,20 +480,6 @@ function xcat () {
     return 0
 }
 
-# Remove these functions again, they are of use only in these
-# setup files. This should be called at the end of .zshrc.
-function xunfunction () {
-    emulate -L zsh
-    local -a funcs
-    local func
-    funcs=(salias xcat xsource xunfunction zrcautoload zrcautozle)
-    for func in $funcs ; do
-        [[ -n ${functions[$func]} ]] \
-            && unfunction $func
-    done
-    return 0
-}
-
 # this allows us to stay in sync with grml's zshrc and put own
 # modifications in ~/.zshrc.local
 function zrclocal () {
@@ -649,7 +493,7 @@ if (( ZSH_NO_DEFAULT_LOCALE == 0 )); then
     xsource "/etc/default/locale"
 fi
 
-for var in LANG LC_ALL LC_MESSAGES ; do
+for var in LANG LANGUAGE LC_ALL LC_COLLATE LC_CTYPE LC_IDENTIFICATION LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC LC_PAPER LC_TELEPHONE LC_TIME ; do
     [[ -n ${(P)var} ]] && export $var
 done
 builtin unset -v var
@@ -670,19 +514,16 @@ export MAIL=${MAIL:-/var/mail/$USER}
 
 # color setup for ls:
 check_com -c dircolors && eval $(dircolors -b)
-# color setup for ls on OS X / FreeBSD:
-isdarwin && export CLICOLOR=1
-isfreebsd && export CLICOLOR=1
 
-# do MacPorts setup on darwin
+# Setup PATH from system defaults on macOS.
+if [[ -x /usr/libexec/path_helper ]] && [[ "$NOPATHHELPER" -eq 0 ]] ; then
+    eval $(/usr/libexec/path_helper -s)
+fi
+# Add MacPorts PATH on darwin/macOS.
 if isdarwin && [[ -d /opt/local ]]; then
-    # Note: PATH gets set in /etc/zprofile on Darwin, so this can't go into
-    # zshenv.
     PATH="/opt/local/bin:/opt/local/sbin:$PATH"
     MANPATH="/opt/local/share/man:$MANPATH"
 fi
-# do Fink setup on darwin
-isdarwin && xsource /sw/bin/init.sh
 
 # load our function and completion directories
 for fdir in /usr/share/grml/zsh/completion /usr/share/grml/zsh/functions; do
@@ -716,18 +557,15 @@ watch=(notme root)
 typeset -U path PATH cdpath CDPATH fpath FPATH manpath MANPATH
 
 # Load a few modules
-is4 && \
 for mod in parameter complist deltochar mathfunc ; do
     zmodload -i zsh/${mod} 2>/dev/null
     grml_status_feature mod:$mod $?
 done && builtin unset -v mod
 
 # autoload zsh modules when they are referenced
-if is4 ; then
-    zmodload -a  zsh/stat    zstat
-    zmodload -a  zsh/zpty    zpty
-    zmodload -ap zsh/mapfile mapfile
-fi
+zmodload -a  zsh/stat    zstat
+zmodload -a  zsh/zpty    zpty
+zmodload -ap zsh/mapfile mapfile
 
 # completion system
 COMPDUMPFILE=${COMPDUMPFILE:-${ZDOTDIR:-${HOME}}/.zcompdump}
@@ -744,7 +582,7 @@ fi
 
 # completion system
 
-# called later (via is4 && grmlcomp)
+# called later (via grmlcomp)
 # note: use 'zstyle' for getting current settings
 #         press ^xh (control-x h) for getting tags in context; ^x? (control-x ?) to run complete_debug with trace output
 function grmlcomp () {
@@ -891,27 +729,21 @@ function grmlcomp () {
     fi
 
     # host completion
-    _etc_hosts=()
     _ssh_config_hosts=()
+    if [[ -r ~/.ssh/config ]] ; then
+        _ssh_config_hosts=(${${(s: :)${(ps:\t:)${${(@M)${(f)"$(<$HOME/.ssh/config)"}:#Host *}#Host }}}:#*[*?]*})
+    fi
     _ssh_hosts=()
-    if is42 ; then
-        if [[ -r ~/.ssh/config ]] ; then
-            _ssh_config_hosts=(${${(s: :)${(ps:\t:)${${(@M)${(f)"$(<$HOME/.ssh/config)"}:#Host *}#Host }}}:#*[*?]*})
-        fi
-
-        if [[ -r ~/.ssh/known_hosts ]] ; then
-            _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*})
-        fi
-
-        if [[ -r /etc/hosts ]] && [[ "$NOETCHOSTS" -eq 0 ]] ; then
-            : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(grep -v '^0\.0\.0\.0\|^127\.0\.0\.1\|^::1 ' /etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
-        fi
+    if [[ -r ~/.ssh/known_hosts ]] ; then
+        _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*})
+    fi
+    _etc_hosts=()
+    if [[ -r /etc/hosts ]] && [[ "$NOETCHOSTS" -eq 0 ]] ; then
+        : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(grep -v '^0\.0\.0\.0\|^127\.0\.0\.1\|^::1 ' /etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
     fi
 
-    local localname
-    localname="$(uname -n)"
     hosts=(
-        "${localname}"
+        "$HOST"
         "$_ssh_config_hosts[@]"
         "$_ssh_hosts[@]"
         "$_etc_hosts[@]"
@@ -1144,14 +976,17 @@ abk=(
     'G'    '|& grep '${grep_options:+"${grep_options[*]}"}
     'H'    '| head'
     'Hl'   ' --help |& less -r'    #d (Display help in pager)
+    'J'    '| jq'
+    'K'    '| keep'
     'L'    '| less'
     'LL'   '|& less -r'
     'M'    '| most'
     'N'    '&>/dev/null'           #d (No Output)
-    'R'    '| tr A-z N-za-m'       #d (ROT13)
+    'R'    '| tr A-Za-z N-ZA-Mn-za-m' #d (ROT13)
     'SL'   '| sort | less'
     'S'    '| sort -u'
     'T'    '| tail'
+    'TS'   '| ts "%F %H:%M:%.S"'
     'V'    '|& vim -'
 #A# end
     'co'   './configure && make && sudo make install'
@@ -1381,7 +1216,6 @@ zle -N help-zle
 ## complete word from currently visible Screen or Tmux buffer.
 if check_com -c screen || check_com -c tmux; then
     function _complete_screen_display () {
-        [[ "$TERM" != "screen" ]] && return 1
 
         local TMPFILE=$(mktemp)
         local -U -a _screen_display_wordlist
@@ -1392,8 +1226,9 @@ if check_com -c screen || check_com -c tmux; then
             #works, but crashes tmux below version 1.4
             #luckily tmux -V option to ask for version, was also added in 1.4
             tmux -V &>/dev/null || return
-            tmux -q capture-pane \; save-buffer -b 0 $TMPFILE \; delete-buffer -b 0
+            tmux -q capture-pane -b 0 \; save-buffer -b 0 $TMPFILE \; delete-buffer -b 0
         else
+            [[ "$TERM" != "screen" ]] && return
             screen -X hardcopy $TMPFILE
             # screen sucks, it dumps in latin1, apparently always. so recode it
             # to system charset
@@ -1652,13 +1487,8 @@ zrcautoload zed
 # else
 #    print 'Notice: no url-quote-magic available :('
 # fi
-if is51 ; then
-  # url-quote doesn't work without bracketed-paste-magic since Zsh 5.1
-  alias url-quote='autoload -U bracketed-paste-magic url-quote-magic;
-                   zle -N bracketed-paste bracketed-paste-magic; zle -N self-insert url-quote-magic'
-else
-  alias url-quote='autoload -U url-quote-magic ; zle -N self-insert url-quote-magic'
-fi
+alias url-quote='autoload -U bracketed-paste-magic url-quote-magic;
+                 zle -N bracketed-paste bracketed-paste-magic; zle -N self-insert url-quote-magic'
 
 #m# k ESC-h Call \kbd{run-help} for the 1st word on the command line
 alias run-help >&/dev/null && unalias run-help
@@ -1681,8 +1511,11 @@ function command_not_found_handler () {
 
 #v#
 HISTFILE=${HISTFILE:-${ZDOTDIR:-${HOME}}/.zsh_history}
-isgrmlcd && HISTSIZE=500  || HISTSIZE=5000
-isgrmlcd && SAVEHIST=1000 || SAVEHIST=10000 # useful for setopt append_history
+# override settings only if the defaults from zsh are in place
+if [[ -z $HISTSIZE || $HISTSIZE -eq 30 ]] ; then
+  HISTSIZE=5000
+  SAVEHIST=10000  # useful for setopt append_history
+fi
 
 # dirstack handling
 
@@ -1707,7 +1540,7 @@ if zstyle -T ':grml:chpwd:dirstack' enable; then
 
     function chpwd () {
         (( ZSH_SUBSHELL )) && return
-        (( $DIRSTACKSIZE <= 0 )) && return
+        (( DIRSTACKSIZE <= 0 )) && return
         [[ -z $DIRSTACKFILE ]] && return
         grml_dirstack_filter $PWD && return
         GRML_PERSISTENT_DIRSTACK=(
@@ -1739,8 +1572,6 @@ if zstyle -T ':grml:chpwd:dirstack' enable; then
 fi
 
 # directory based profiles
-
-if is433 ; then
 
 # chpwd_profiles(): Directory Profiles, Quickstart:
 #
@@ -1777,41 +1608,17 @@ function chpwd_profiles () {
 
 chpwd_functions=( ${chpwd_functions} chpwd_profiles )
 
-fi # is433
-
 # Prompt setup for grml:
 
-# set colors for use in prompts (modern zshs allow for the use of %F{red}foo%f
-# in prompts to get a red "foo" embedded, but it's good to keep these for
-# backwards compatibility).
-if is437; then
-    BLUE="%F{blue}"
-    RED="%F{red}"
-    GREEN="%F{green}"
-    CYAN="%F{cyan}"
-    MAGENTA="%F{magenta}"
-    YELLOW="%F{yellow}"
-    WHITE="%F{white}"
-    NO_COLOR="%f"
-elif zrcautoload colors && colors 2>/dev/null ; then
-    BLUE="%{${fg[blue]}%}"
-    RED="%{${fg_bold[red]}%}"
-    GREEN="%{${fg[green]}%}"
-    CYAN="%{${fg[cyan]}%}"
-    MAGENTA="%{${fg[magenta]}%}"
-    YELLOW="%{${fg[yellow]}%}"
-    WHITE="%{${fg[white]}%}"
-    NO_COLOR="%{${reset_color}%}"
-else
-    BLUE=$'%{\e[1;34m%}'
-    RED=$'%{\e[1;31m%}'
-    GREEN=$'%{\e[1;32m%}'
-    CYAN=$'%{\e[1;36m%}'
-    WHITE=$'%{\e[1;37m%}'
-    MAGENTA=$'%{\e[1;35m%}'
-    YELLOW=$'%{\e[1;33m%}'
-    NO_COLOR=$'%{\e[0m%}'
-fi
+# set colors for use in prompts.
+BLUE="%F{blue}"
+RED="%F{red}"
+GREEN="%F{green}"
+CYAN="%F{cyan}"
+MAGENTA="%F{magenta}"
+YELLOW="%F{yellow}"
+WHITE="%F{white}"
+NO_COLOR="%f"
 
 # First, the easy ones: PS2..4:
 
@@ -1969,16 +1776,6 @@ fi
 # gather version control information for inclusion in a prompt
 
 if zrcautoload vcs_info; then
-    # `vcs_info' in zsh versions 4.3.10 and below have a broken `_realpath'
-    # function, which can cause a lot of trouble with our directory-based
-    # profiles. So:
-    if [[ ${ZSH_VERSION} == 4.3.<-10> ]] ; then
-        function VCS_INFO_realpath () {
-            setopt localoptions NO_shwordsplit chaselinks
-            ( builtin cd -q $1 2> /dev/null && pwd; )
-        }
-    fi
-
     zstyle ':vcs_info:*' max-exports 2
 
     if [[ -o restricted ]]; then
@@ -2159,10 +1956,6 @@ __EOF0__
 function grml_prompt_setup () {
     emulate -L zsh
     autoload -Uz vcs_info
-    # The following autoload is disabled for now, since this setup includes a
-    # static version of the ‘add-zsh-hook’ function above. It needs to be
-    # re-enabled as soon as that static definition is removed again.
-    #autoload -Uz add-zsh-hook
     add-zsh-hook precmd prompt_$1_precmd
 }
 
@@ -2520,41 +2313,34 @@ else
     function precmd () { (( ${+functions[vcs_info]} )) && vcs_info; }
 fi
 
-if is437; then
-    # The prompt themes use modern features of zsh, that require at least
-    # version 4.3.7 of the shell. Use the fallback otherwise.
-    if [[ $GRML_DISPLAY_BATTERY -gt 0 ]]; then
-        zstyle ':prompt:grml:right:setup' items sad-smiley battery
-        add-zsh-hook precmd battery
-    fi
-    if [[ "$TERM" == dumb ]] ; then
-        zstyle ":prompt:grml(|-large|-chroot):*:items:grml-chroot" pre ''
-        zstyle ":prompt:grml(|-large|-chroot):*:items:grml-chroot" post ' '
-        for i in rc user path jobs history date time shell-level; do
-            zstyle ":prompt:grml(|-large|-chroot):*:items:$i" pre ''
-            zstyle ":prompt:grml(|-large|-chroot):*:items:$i" post ''
-        done
-        unset i
-        zstyle ':prompt:grml(|-large|-chroot):right:setup' use-rprompt false
-    elif (( EUID == 0 )); then
-        zstyle ':prompt:grml(|-large|-chroot):*:items:user' pre '%B%F{red}'
-    fi
+if [[ $GRML_DISPLAY_BATTERY -gt 0 ]]; then
+    zstyle ':prompt:grml:right:setup' items sad-smiley battery
+    add-zsh-hook precmd battery
+fi
+if [[ "$TERM" == dumb ]] ; then
+    zstyle ":prompt:grml(|-large|-chroot):*:items:grml-chroot" pre ''
+    zstyle ":prompt:grml(|-large|-chroot):*:items:grml-chroot" post ' '
+    for i in rc user path jobs history date time shell-level; do
+        zstyle ":prompt:grml(|-large|-chroot):*:items:$i" pre ''
+        zstyle ":prompt:grml(|-large|-chroot):*:items:$i" post ''
+    done
+    unset i
+    zstyle ':prompt:grml(|-large|-chroot):right:setup' use-rprompt false
+elif (( EUID == 0 )); then
+    zstyle ':prompt:grml(|-large|-chroot):*:items:user' pre '%B%F{red}'
+fi
 
-    # Finally enable one of the prompts.
-    if [[ -n $GRML_CHROOT ]]; then
-        prompt grml-chroot
-    elif [[ $GRMLPROMPT -gt 0 ]]; then
-        prompt grml-large
-    else
-        prompt grml
-    fi
+# Finally enable one of the prompts.
+if [[ -n $GRML_CHROOT ]]; then
+    prompt grml-chroot
+elif [[ $GRMLPROMPT -gt 0 ]]; then
+    prompt grml-large
 else
-    grml_prompt_fallback
-    function precmd () { (( ${+functions[vcs_info]} )) && vcs_info; }
+    prompt grml
 fi
 
 # make sure to use right prompt only when not running a command
-is41 && setopt transient_rprompt
+setopt transient_rprompt
 
 # Terminal-title wizardry
 
@@ -2596,21 +2382,11 @@ function grml_vcs_to_screen_title () {
     fi
 }
 
-function grml_maintain_name () {
-    local localname
-    localname="$(uname -n)"
-
-    # set hostname if not running on local machine
-    if [[ -n "$HOSTNAME" ]] && [[ "$HOSTNAME" != "${localname}" ]] ; then
-       NAME="@$HOSTNAME"
-    fi
-}
-
 function grml_cmd_to_screen_title () {
-    # get the name of the program currently running and hostname of local
-    # machine set screen window title if running in a screen
+    # get the name of the currently running program to set screen window title
+    # if running in a screen.
     if [[ "$TERM" == screen* ]] ; then
-        local CMD="${1[(wr)^(*=*|sudo|ssh|-*)]}$NAME"
+        local CMD="${1[(wr)^(*=*|sudo|ssh|-*)]}"
         ESC_print ${CMD}
     fi
 }
@@ -2623,14 +2399,9 @@ function grml_control_xterm_title () {
     esac
 }
 
-# The following autoload is disabled for now, since this setup includes a
-# static version of the ‘add-zsh-hook’ function above. It needs to be
-# re-enabled as soon as that static definition is removed again.
-#zrcautoload add-zsh-hook || add-zsh-hook () { :; }
 if [[ $NOPRECMD -eq 0 ]]; then
     add-zsh-hook precmd grml_reset_screen_title
     add-zsh-hook precmd grml_vcs_to_screen_title
-    add-zsh-hook preexec grml_maintain_name
     add-zsh-hook preexec grml_cmd_to_screen_title
     if [[ $NOTITLE -eq 0 ]]; then
         add-zsh-hook preexec grml_control_xterm_title
@@ -2650,17 +2421,13 @@ hash -d www=/var/www
 
 # some aliases
 if check_com -c screen ; then
-    if [[ $UID -eq 0 ]] ; then
-        if [[ -r /etc/grml/screenrc ]]; then
-            alias screen='screen -c /etc/grml/screenrc'
-        fi
-    elif [[ ! -r $HOME/.screenrc ]] ; then
-        if [[ -r /etc/grml/screenrc_grml ]]; then
-            alias screen='screen -c /etc/grml/screenrc_grml'
-        else
-            if [[ -r /etc/grml/screenrc ]]; then
-                alias screen='screen -c /etc/grml/screenrc'
-            fi
+    SCREENRC=screenrc
+    if [ "${${${$(screen -v)#*version* }%% *}%%.*}" = 4 ]; then
+        SCREENRC=screenrc_v4
+    fi
+    if [[ ! -r "$HOME"/.screenrc ]]; then
+        if [[ -r /etc/grml/"$SCREENRC" ]]; then
+            alias screen="screen -c /etc/grml/$SCREENRC"
         fi
     fi
 fi
@@ -2698,38 +2465,6 @@ alias ...='cd ../../'
 # generate alias named "$KERNELVERSION-reboot" so you can use boot with kexec:
 if [[ -x /sbin/kexec ]] && [[ -r /proc/cmdline ]] ; then
     alias "$(uname -r)-reboot"="kexec -l --initrd=/boot/initrd.img-"$(uname -r)" --command-line=\"$(cat /proc/cmdline)\" /boot/vmlinuz-"$(uname -r)""
-fi
-
-# see http://www.cl.cam.ac.uk/~mgk25/unicode.html#term for details
-alias term2iso="echo 'Setting terminal to iso mode' ; print -n '\e%@'"
-alias term2utf="echo 'Setting terminal to utf-8 mode'; print -n '\e%G'"
-
-# make sure it is not assigned yet
-[[ -n ${aliases[utf2iso]} ]] && unalias utf2iso
-function utf2iso () {
-    if isutfenv ; then
-        local ENV
-        for ENV in $(env | command grep -i '.utf') ; do
-            eval export "$(echo $ENV | sed 's/UTF-8/iso885915/ ; s/utf8/iso885915/')"
-        done
-    fi
-}
-
-# make sure it is not assigned yet
-[[ -n ${aliases[iso2utf]} ]] && unalias iso2utf
-function iso2utf () {
-    if ! isutfenv ; then
-        local ENV
-        for ENV in $(env | command grep -i '\.iso') ; do
-            eval export "$(echo $ENV | sed 's/iso.*/UTF-8/ ; s/ISO.*/UTF-8/')"
-        done
-    fi
-}
-
-# especially for roadwarriors using GNU screen and ssh:
-if ! check_com asc &>/dev/null ; then
-  function asc () { autossh -t "$@" 'screen -RdU' }
-  compdef asc=ssh
 fi
 
 #f1# Hints for the use of zsh on grml
@@ -2801,7 +2536,7 @@ Enjoy your grml system with the zsh!$reset_color"
 }
 
 # debian stuff
-if [[ -r /etc/debian_version ]] ; then
+if grep -q -e '^ID=debian$' -e '^ID_LIKE=.*debian' /etc/os-release 2>/dev/null ; then
     if [[ -z "$GRML_NO_APT_ALIASES" ]]; then
         #a3# Execute \kbd{apt-cache policy}
         alias acp='apt-cache policy'
@@ -2826,14 +2561,24 @@ if [[ -r /etc/debian_version ]] ; then
           salias agi="apt-get install"
           salias au="apt-get update"
         fi
-        #a3# Execute \kbd{aptitude install}
-        salias ati="aptitude install"
-        #a3# Execute \kbd{aptitude update ; aptitude safe-upgrade}
-        salias -a up="aptitude update ; aptitude safe-upgrade"
-        #a3# Execute \kbd{dpkg-buildpackage}
-        alias dbp='dpkg-buildpackage'
-        #a3# Execute \kbd{grep-excuses}
-        alias ge='grep-excuses'
+        if check_com -c aptitude ; then
+          #a3# Execute \kbd{aptitude install}
+          salias ati="aptitude install"
+          #a3# Execute \kbd{aptitude update ; aptitude safe-upgrade}
+          salias -a up="aptitude update ; aptitude safe-upgrade"
+        fi
+        if check_com -c dpkg-buildpackage ; then
+          #a3# Execute \kbd{dpkg-buildpackage}
+          alias dbp='dpkg-buildpackage'
+        fi
+        if check_com -c grep-excuses ; then
+          #a3# Execute \kbd{grep-excuses}
+          alias ge='grep-excuses'
+        fi
+        if check_com -c apt-file ; then
+          alias afs='apt-file search'
+          alias afl='apt-file list'
+        fi
     fi
 
     # get a root shell as normal user in live-cd mode:
@@ -2860,21 +2605,6 @@ if check_com -c dpkg-query ; then
     alias debs-by-size="dpkg-query -Wf 'x \${Installed-Size} \${Package} \${Status}\n' | sed -ne '/^x  /d' -e '/^x \(.*\) install ok installed$/s//\1/p' | sort -nr"
 fi
 
-# if cdrecord is a symlink (to wodim) or isn't present at all warn:
-if [[ -L /usr/bin/cdrecord ]] || ! check_com -c cdrecord; then
-    if check_com -c wodim; then
-        function cdrecord () {
-            <<__EOF0__
-cdrecord is not provided under its original name by Debian anymore.
-See #377109 in the BTS of Debian for more details.
-
-Please use the wodim binary instead
-__EOF0__
-            return 1
-        }
-    fi
-fi
-
 if isgrmlcd; then
     # No core dumps: important for a live-cd-system
     limit -s core 0
@@ -2882,17 +2612,10 @@ fi
 
 # grmlstuff
 function grmlstuff () {
-# people should use 'grml-x'!
-    if check_com -c 915resolution; then
-        function 855resolution () {
-            echo "Please use 915resolution as resolution modifying tool for Intel \
-graphic chipset."
-            return -1
-        }
+    if [ -r /etc/grml_version ]; then
+      #a1# Output version of running grml
+      alias grml-version='cat /etc/grml_version'
     fi
-
-    #a1# Output version of running grml
-    alias grml-version='cat /etc/grml_version'
 
     if check_com -c grml-debootstrap ; then
         function debian2hd () {
@@ -2914,12 +2637,11 @@ graphic chipset."
 }
 
 # now run the functions
-isgrml && checkhome
-is4    && isgrml    && grmlstuff
-is4    && grmlcomp
+isgrml && grmlstuff
+grmlcomp
 
 # keephack
-is4 && xsource "/etc/zsh/keephack"
+xsource "/etc/zsh/keephack"
 
 # wonderful idea of using "e" glob qualifier by Peter Stephenson
 # You use it as follows:
@@ -2928,7 +2650,7 @@ is4 && xsource "/etc/zsh/keephack"
 # This lists all the files in the current directory newer than the reference file.
 # You can also specify the reference file inline; note quotes:
 # $ ls -l *(e:'nt ~/.zshenv':)
-is4 && function nt () {
+function nt () {
     if [[ -n $1 ]] ; then
         local NTREF=${~1}
     fi
@@ -2962,8 +2684,7 @@ compdef _functions freload
 #      that the displayed information does make any sense on your OS.
 #      We leave that decission to the user.
 #
-#      The zstat module is used to detect symlink loops. zstat is available since zsh4.
-#      With an older zsh you will need to abort with <C-c> in that case.
+#      The zstat module is used to detect symlink loops.
 #      When a symlink loop is detected, a warning ist printed and further processing is stopped.
 #
 #      Module zstat is loaded by default in grml zshrc, no extra action needed for that.
@@ -2998,17 +2719,16 @@ function sll () {
         ls -l "${file:a}"   || RTN=1
 
         while [[ -h "$file" ]] ; do
-            if is4 ; then
-                LINODE=$(zstat -L +inode "${file}")
-                for i in ${SEENINODES} ; do
-                    if (( ${i} == ${LINODE} )) ; then
-                        builtin cd -q "${curdir}"
-                        print 'link loop detected, aborting!'
-                        return 2
-                    fi
-                done
-                SEENINODES+=${LINODE}
-            fi
+            LINODE=$(zstat -L +inode "${file}")
+            for i in ${SEENINODES} ; do
+                if (( ${i} == ${LINODE} )) ; then
+                    builtin cd -q "${curdir}"
+                    print 'link loop detected, aborting!'
+                    return 2
+                fi
+            done
+            SEENINODES+=${LINODE}
+
             jumpd="${file:h}"
             file="${file:t}"
 
@@ -3058,7 +2778,11 @@ if check_com -c $PAGER ; then
         fi
 
         for package in "$@" ; do
-            if [[ -r /usr/share/doc/${package}/changelog.Debian.gz ]] ; then
+            if [[ -f /usr/share/doc/${package} ]] ; then
+                # Allow opening specific changelog file.
+                # example: dchange $PACKAGE/changelog.md.gz
+                $viewer /usr/share/doc/${package}
+            elif [[ -r /usr/share/doc/${package}/changelog.Debian.gz ]] ; then
                 $viewer /usr/share/doc/${package}/changelog.Debian.gz
             elif [[ -r /usr/share/doc/${package}/changelog.gz ]] ; then
                 $viewer /usr/share/doc/${package}/changelog.gz
@@ -3077,7 +2801,7 @@ if check_com -c $PAGER ; then
             fi
         done
     }
-    function _dchange () { _files -W /usr/share/doc -/ }
+    function _dchange () { _files -W /usr/share/doc -g "*changelog*" }
     compdef _dchange dchange
 
     #f3# View Debian's NEWS of a given package
@@ -3096,6 +2820,25 @@ if check_com -c $PAGER ; then
     }
     function _dnews () { _files -W /usr/share/doc -/ }
     compdef _dnews dnews
+
+    #f3# View Debian's README of a given package
+    function dreadme () {
+        emulate -L zsh
+        if [[ -f /usr/share/doc/$1 ]] ; then
+            # Allow opening specific file. 
+            # example: dreadme $PACKAGE/README.md.gz
+            $PAGER /usr/share/doc/$1
+        elif [[ -r /usr/share/doc/$1/README.Debian ]] ; then
+            $PAGER /usr/share/doc/$1/README.Debian
+        elif [[ -r /usr/share/doc/$1/README.gz ]] ; then
+            $PAGER /usr/share/doc/$1/README.gz
+        else
+            echo "No README file for package $1 found, sorry."
+            return 1
+        fi
+    }
+    function _dreadme () { _files -W /usr/share/doc -g "*README*" }
+    compdef _dreadme dreadme
 
     #f3# View Debian's copyright of a given package
     function dcopyright () {
@@ -3148,32 +2891,16 @@ compdef _functions edfunc
 #m# f6 Reload() \kbd{service \em{process}}\quad\kbd{reload}
 #m# f6 Force-Reload() \kbd{service \em{process}}\quad\kbd{force-reload}
 #m# f6 Status() \kbd{service \em{process}}\quad\kbd{status}
-if [[ -d /etc/init.d || -d /etc/service ]] ; then
+if [[ -d /etc/init.d ]] ; then
     function __start_stop () {
         local action_="${1:l}"  # e.g Start/Stop/Restart
         local service_="$2"
         local param_="$3"
 
-        local service_target_="$(readlink /etc/init.d/$service_)"
-        if [[ $service_target_ == "/usr/bin/sv" ]]; then
-            # runit
-            case "${action_}" in
-                start) if [[ ! -e /etc/service/$service_ ]]; then
-                           $SUDO ln -s "/etc/sv/$service_" "/etc/service/"
-                       else
-                           $SUDO "/etc/init.d/$service_" "${action_}" "$param_"
-                       fi ;;
-                # there is no reload in runits sysv emulation
-                reload) $SUDO "/etc/init.d/$service_" "force-reload" "$param_" ;;
-                *) $SUDO "/etc/init.d/$service_" "${action_}" "$param_" ;;
-            esac
+        if check_com -c service ; then
+          $SUDO service "$service_" "${action_}" "$param_"
         else
-            # sysv/sysvinit-utils, upstart
-            if check_com -c service ; then
-              $SUDO service "$service_" "${action_}" "$param_"
-            else
-              $SUDO "/etc/init.d/$service_" "${action_}" "$param_"
-            fi
+          $SUDO "/etc/init.d/$service_" "${action_}" "$param_"
         fi
     }
 
@@ -3227,7 +2954,7 @@ function H-Glob () {
   chmod 644 *(.^x)      # make all plain non-executable files publically readable
   print -l *(.c|.h)     # Lists *.c and *.h
   print **/*(g:users:)  # Recursively match all files that are owned by group 'users'
-  echo /proc/*/cwd(:h:t:s/self//) # Analogous to >ps ax | awk '{print $1}'<"
+  echo /proc/*/cwd(:h:t:s/self//) # Analogous to >ps ax | awk '{print \$1}'<"
 }
 alias help-zshglob=H-Glob
 
@@ -3376,23 +3103,8 @@ alias insecssh='ssh -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/nu
 #a2# scp with StrictHostKeyChecking=no \\&\quad and UserKnownHostsFile unset
 alias insecscp='scp -o "StrictHostKeyChecking=no" -o "UserKnownHostsFile=/dev/null"'
 
-# work around non utf8 capable software in utf environment via $LANG and luit
-if check_com isutfenv && check_com luit ; then
-    if check_com -c mrxvt ; then
-        isutfenv && [[ -n "$LANG" ]] && \
-            alias mrxvt="LANG=${LANG/(#b)(*)[.@]*/$match[1].iso885915} luit mrxvt"
-    fi
-
-    if check_com -c aterm ; then
-        isutfenv && [[ -n "$LANG" ]] && \
-            alias aterm="LANG=${LANG/(#b)(*)[.@]*/$match[1].iso885915} luit aterm"
-    fi
-
-    if check_com -c centericq ; then
-        isutfenv && [[ -n "$LANG" ]] && \
-            alias centericq="LANG=${LANG/(#b)(*)[.@]*/$match[1].iso885915} luit centericq"
-    fi
-fi
+#a2# lsblk (list block devices) with the most useful columns
+alias llblk="lsblk -o +LABEL,PARTLABEL,UUID,FSTYPE,SERIAL"
 
 # useful functions
 
@@ -3504,7 +3216,17 @@ function mkcd () {
 
 #f5# Create temporary directory and \kbd{cd} to it
 function cdt () {
-    builtin cd "$(mktemp -d)"
+    local -a cdttemplate
+    if [ "$#" -eq 1 ]; then
+        if isfreebsd; then
+            # mktemp(1) on FreeBSD doesn't behave the same, cf.
+            # https://man.freebsd.org/cgi/man.cgi?query=mktemp#OPTIONS
+            cdttemplate=(-t "$1")
+        else
+            cdttemplate=(-t "$1".XXXXXXX)
+        fi
+    fi
+    builtin cd "$(mktemp -d ${cdttemplate[@]})"
     builtin pwd
 }
 
@@ -3547,21 +3269,23 @@ fi
 #  $ awk -F ':' '{ print $2" : "$1" "$3 }' \
 #    /usr/local/lib/words/en-de.ISO-8859-1.vok > ~/.translate/de-en.ISO-8859-1.vok
 #f5# Translates a word
-function trans () {
-    emulate -L zsh
-    case "$1" in
-        -[dD]*)
-            translate -l de-en $2
-            ;;
-        -[eE]*)
-            translate -l en-de $2
-            ;;
-        *)
-            echo "Usage: $0 { -D | -E }"
-            echo "         -D == German to English"
-            echo "         -E == English to German"
-    esac
-}
+if ! check_com -c trans; then
+  function trans () {
+      emulate -L zsh
+      case "$1" in
+          -[dD]*)
+              translate -l de-en $2
+              ;;
+          -[eE]*)
+              translate -l en-de $2
+              ;;
+          *)
+              echo "Usage: $0 { -D | -E }"
+              echo "         -D == German to English"
+              echo "         -E == English to German"
+      esac
+  }
+fi
 
 # Usage: simple-extract <file>
 # Using option -d deletes the original archive file.
@@ -3737,6 +3461,16 @@ function _simple_extract () {
 compdef _simple_extract simple-extract
 [[ -n "$GRML_NO_SMALL_ALIASES" ]] || alias se=simple-extract
 
+#f5# Show "public" IP address of current system on stdout. Requires network access and curl(1).
+function myip () {
+    if [[ $# == 0 ]] || [[ $# == 1 && $1 == "-4" ]] || [[ $# == 1 && $1 == "-6" ]] ; then
+        curl "$@" https://myip.grml.org -H 'User-Agent: grml-etc-core-zshrc'
+    else
+        printf 'usage: myip [-4|-6]\n' >&2
+        return 1
+    fi
+}
+
 #f5# Change the xterm title from within GNU-screen
 function xtrename () {
     emulate -L zsh
@@ -3757,51 +3491,6 @@ function xtrename () {
     fi
     print -n "\eP\e]0;${1}\C-G\e\\"
     return 0
-}
-
-# Create small urls via http://goo.gl using curl(1).
-# API reference: https://code.google.com/apis/urlshortener/
-function zurl () {
-    emulate -L zsh
-    setopt extended_glob
-
-    if [[ -z $1 ]]; then
-        print "USAGE: zurl <URL>"
-        return 1
-    fi
-
-    local PN url prog api json contenttype item
-    local -a data
-    PN=$0
-    url=$1
-
-    # Prepend 'http://' to given URL where necessary for later output.
-    if [[ ${url} != http(s|)://* ]]; then
-        url='http://'${url}
-    fi
-
-    if check_com -c curl; then
-        prog=curl
-    else
-        print "curl is not available, but mandatory for ${PN}. Aborting."
-        return 1
-    fi
-    api='https://www.googleapis.com/urlshortener/v1/url'
-    contenttype="Content-Type: application/json"
-    json="{\"longUrl\": \"${url}\"}"
-    data=(${(f)"$($prog --silent -H ${contenttype} -d ${json} $api)"})
-    # Parse the response
-    for item in "${data[@]}"; do
-        case "$item" in
-            ' '#'"id":'*)
-                item=${item#*: \"}
-                item=${item%\",*}
-                printf '%s\n' "$item"
-                return 0
-                ;;
-        esac
-    done
-    return 1
 }
 
 #f2# Find history events by search pattern and list them by date.
@@ -3862,10 +3551,6 @@ if check_com -c hg ; then
         local i
         for i in $(hg status -marn "$@") ; diff -ubwd <(hg cat "$i") "$i"
     }
-
-    # build debian package
-    #a2# Alias for \kbd{hg-buildpackage}
-    alias hbp='hg-buildpackage'
 
     # execute commands on the versioned patch-queue from the current repos
     [[ -n "$GRML_NO_SMALL_ALIASES" ]] || alias mq='hg -R $(readlink -f $(hg root)/.hg/patches)'
